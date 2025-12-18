@@ -1,194 +1,210 @@
-# INDEX - Projektin dokumenttikartta
+# [PROJEKTIN NIMI] - INDEX
 
-> **Versio:** 1.0  
 > **Päivitetty:** [PÄIVÄMÄÄRÄ]  
-> **Projekti:** [PROJEKTIN NIMI]
+> **Versio:** 1.1
+
+**⚠️ LUE TÄMÄ AINA SESSION ALUSSA!** Tämä dokumentti kertoo mitä prosessiohjeita ja skillejä on käytettävissä.
 
 <!-- 
 KÄYTTÖOHJE:
-1. Korvaa [PLACEHOLDER]-kohdat projektikohtaisilla tiedoilla
-2. Lisää moduulit sitä mukaa kun ne syntyvät
-3. Päivitä status-merkit kun dokumentit valmistuvat
+1. Korvaa [PROJEKTIN NIMI] projektisi nimellä
+2. Päivitä rakenne vastaamaan projektiasi
+3. Päivitä statukset projektin edetessä
 4. Poista tämä kommenttilohko kun olet valmis
 -->
 
 ---
 
-## Projektin status
+## 📁 Projektin rakenne
 
 ```
-[░░░░░░░░░░] 0% - Aloitusvaihe
-```
-
-**Seuraava askel:** [Kuvaile seuraava tehtävä]
-
----
-
-## ⚡ Quick Reference: Milloin mikäkin dokumentti/skill?
-
-### Päivittäinen käyttö
-
-| Tilanne | Dokumentti/Skill | Sijainti |
-|---------|------------------|----------|
-| **Session aloitus** | KEHITYSLOKI | Kontekstissa |
-| **Mistä löytyy X?** | INDEX (tämä) | Kontekstissa |
-| **Moduulin status?** | MASTER_FUNCTIONAL | Kontekstissa/GitHub |
-
-### Skillit (ladataan tarvittaessa)
-
-| Tilanne | Skill | Triggeri |
-|---------|-------|----------|
-| **SPEC/RESEARCH kirjoitus** | `spec-writing` | "kirjoita SPEC", "aloita RESEARCH" |
-| **Dokumentin tallennus** | `document-updates` | "tallenna", "commit", "encoding" |
-| **Uusi projekti** | `market-research` | "Phase 0", "kilpailija-analyysi" |
-| **Tietokantamuutos** | `database-management` | "skeema", "taulu", "migraatio" |
-| **Testaus** | `testing` | "TDD", "testiskenaariot" |
-| **Arkkitehtuuri** | `systems-architecture` | "rajapinta", "primitiivi" |
-
-**Skillin käyttö:**
-```
-view /mnt/skills/user/[skill-nimi]/SKILL.md
-```
-
-### Skillien ja prosessiohjeiden suhde
-
-```
-SKILL (kevyt, kontekstissa)     →  PROSESSIOHJE (täysi, GitHubissa)
-───────────────────────────────────────────────────────────────────
-spec-writing                    →  PROCESS_SPEC_Writing.md
-document-updates                →  PROCESS_Document_Updates.md
-market-research                 →  PROCESS_Market_Research.md
-database-management             →  PROCESS_Database_Management.md
-testing                         →  PROCESS_Testing.md
-systems-architecture            →  (sisäänrakennettu)
-```
-
----
-
-## 📚 Dokumentaatiokerrokset
-
-### Kerros 1: Aina kontekstissa
-
-| Dokumentti | Tarkoitus | Token-arvio |
-|------------|-----------|-------------|
-| **System Prompt** | Säännöt, työtapa, skill-triggerit | ~15K |
-| **INDEX** | Tiedostokartta, quick reference | ~10K |
-| **KEHITYSLOKI** | Missä mennään, seuraavat askeleet | ~8K |
-| **Yhteensä** | | **~33K** |
-
-### Kerros 2: Skillit (ladataan tarvittaessa)
-
-| Skill | Koko |
-|-------|------|
-| spec-writing | ~6K |
-| document-updates | ~5K |
-| market-research | ~4K |
-| database-management | ~5K |
-| testing | ~7K |
-| systems-architecture | ~9K |
-
-### Kerros 3: GitHub (haetaan tarvittaessa)
-
-| Dokumentti | Milloin | Koko |
-|------------|---------|------|
-| ARCHITECTURE_OVERVIEW | Arkkitehtuurikysymykset | vaihtelee |
-| API_REFERENCE | Koodausvaihe | vaihtelee |
-| MASTER_FUNCTIONAL | Moduulistatukset | vaihtelee |
-| PROCESS_* | Skillin ohjaamana | vaihtelee |
-| SPEC_*, TECH_SPEC_* | Kun työstetään moduulia | vaihtelee |
-
----
-
-## Dokumenttihierarkia
-
-```
-[PROJEKTIN KANSIO]/
+[projekti-nimi]/
+│
+├── claude-project/                 ← CLAUDE.AI PROJEKTITIEDOSTOT
+│   ├── SYSTEM_PROMPT.md            ← Projektin ohjeet (→ Custom instructions)
+│   ├── INDEX.md                    ← Tämä tiedosto (PAKOLLINEN)
+│   └── KEHITYSLOKI.md              ← Edistymisen seuranta (PAKOLLINEN)
 │
 ├── docs/
-│   ├── process/                      ← Prosessiohjeet
+│   ├── architecture/               ← ARKKITEHTUURIDOKUMENTIT
+│   │   ├── ARCHITECTURE_OVERVIEW.md
+│   │   ├── API_REFERENCE.md
+│   │   └── DATABASE_SCHEMA.md
+│   │
+│   ├── specs/                      ← MÄÄRITTELYDOKUMENTIT
+│   │   ├── MASTER_FUNCTIONAL.md    ← Toiminnallinen kokonaiskuva
+│   │   ├── RESEARCH_*.md           ← Tutkimusdokumentit
+│   │   ├── SPEC_*.md               ← Toiminnalliset määrittelyt
+│   │   └── TECH_SPEC_*.md          ← Tekniset määrittelyt
+│   │
+│   ├── process/                    ← PROSESSIOHJEET
+│   │   ├── PROCESS_Research_Methodology.md
 │   │   ├── PROCESS_SPEC_Writing.md
 │   │   ├── PROCESS_Document_Updates.md
 │   │   ├── PROCESS_Database_Management.md
-│   │   ├── PROCESS_Market_Research.md
 │   │   ├── PROCESS_Testing.md
 │   │   ├── PROCESS_Code.md
-│   │   └── PROCESS_Research_Methodology.md
+│   │   ├── PROCESS_Debugging.md
+│   │   ├── PROCESS_Implementation_Strategy.md
+│   │   └── PROCESS_Market_Research.md
 │   │
-│   ├── research/                     ← Tutkimusdokumentit
-│   │   ├── RESEARCH_01_[Moduuli].md
-│   │   └── TECH_RESEARCH_01_[Moduuli].md
-│   │
-│   ├── specs/                        ← Toiminnalliset määrittelyt
-│   │   └── SPEC_01_[Moduuli].md
-│   │
-│   ├── tech-specs/                   ← Tekniset määrittelyt
-│   │   └── TECH_SPEC_01_[Moduuli].md
-│   │
-│   ├── briefings/                    ← Claude Code briefingit
-│   │   └── BRIEFING_[Moduuli]_Task01.md
-│   │
-│   └── templates/                    ← Dokumenttitemplatet
+│   └── templates/                  ← DOKUMENTTITEMPLATET
+│       ├── RESEARCH_TEMPLATE.md
 │       ├── SPEC_TEMPLATE.md
 │       ├── TECH_SPEC_TEMPLATE.md
+│       ├── TECH_RESEARCH_TEMPLATE.md
 │       └── BRIEFING_TEMPLATE.md
 │
-├── KEHITYSLOKI.md
-├── INDEX.md
-├── CLAUDE.md                         ← Claude Code -ohjeet
-├── MASTER_FUNCTIONAL.md
+├── src/                            ← LÄHDEKOODI
+│   └── [moduulit]
+│
+├── tests/                          ← TESTIT
+│   └── [testit]
+│
 └── README.md
 ```
 
 ---
 
-## Moduulien dokumentaatiostatus
+## 🛠️ PROSESSIOHJEET - Milloin käytetään mitäkin
 
-<!-- LISÄÄ MODUULIT PROJEKTIN EDETESSÄ -->
+**Sijainti:** `docs/process/`
 
-| Moduuli | RESEARCH | SPEC | TECH_RESEARCH | TECH_SPEC | CODE |
-|---------|----------|------|---------------|-----------|------|
-| [Moduuli 1] | 🔲 | 🔲 | 🔲 | 🔲 | 🔲 |
-| [Moduuli 2] | 🔲 | 🔲 | 🔲 | 🔲 | 🔲 |
-| [Moduuli 3] | 🔲 | 🔲 | 🔲 | 🔲 | 🔲 |
+| Prosessi | Tiedosto | Käytä kun... |
+|----------|----------|--------------|
+| **Research Methodology** | `PROCESS_Research_Methodology.md` | **⚠️ AINA ennen RESEARCH_*.md kirjoitusta!** |
+| **SPEC Writing** | `PROCESS_SPEC_Writing.md` | Kirjoitat SPEC tai TECH_SPEC dokumenttia |
+| **Document Updates** | `PROCESS_Document_Updates.md` | Tallennat dokumentteja, encoding-ongelmat |
+| **Database Management** | `PROCESS_Database_Management.md` | Tietokantamuutokset, skeemasuunnittelu |
+| **Testing** | `PROCESS_Testing.md` | TDD, testiskenaariot, testausstrategia |
+| **Code** | `PROCESS_Code.md` | Koodausvaihe, RGRC-sykli |
+| **Debugging** | `PROCESS_Debugging.md` | Vianselvitys, 3+ Fix Rule |
+| **Implementation Strategy** | `PROCESS_Implementation_Strategy.md` | Hybridimalli, toteutusjärjestys |
+| **Market Research** | `PROCESS_Market_Research.md` | Phase 0, kilpailija-analyysi |
 
-**Symbolit:** ✅ Valmis | 🔶 Työn alla | 🔲 Ei aloitettu
+### ⚠️ KRIITTINEN: RESEARCH/SPEC-dokumentit
 
----
-
-## Session aloitus -pikaohje
-
-### 1. Lue KEHITYSLOKI
-
-```
-[Käytä Desktop Commanderia tai GitHub API:a]
-```
-
-### 2. Tarkista Git status (Windows)
-
-```bash
-git status
-```
-
-### 3. Kysy käyttäjältä tavoite
-
-→ Ehdota aktiivisesti KEHITYSLOKI:n perusteella
+**ENNEN kuin kirjoitat RESEARCH_*.md tai SPEC_*.md dokumenttia:**
+1. LUE vastaava prosessiohje `docs/process/`-kansiosta
+2. KÄYTÄ vastaava template `docs/templates/`-kansiosta
+3. SEURAA prosessia askel askeleelta
 
 ---
 
-## Yleiset käytännöt
+## 🎯 SKILLIT - Lataa tarvittaessa
 
-### "Liittyvät dokumentit" -osio
+**Sijainti:** `/mnt/skills/user/[skill-nimi]/SKILL.md`
 
-Jokaisen dokumentin loppuun tulee taulukko:
+| Skill | Käyttö | Latauskomento |
+|-------|--------|---------------|
+| **systems-architecture** | Arkkitehtuuripäätökset, rajapinnat, primitiivit | `Lue /mnt/skills/user/systems-architecture/SKILL.md` |
+| **document-updates** | Tallennus GitHubiin, encoding, versiointi | `Lue /mnt/skills/user/document-updates/SKILL.md` |
+| **spec-writing** | SPEC/RESEARCH-dokumenttien kirjoitus | `Lue /mnt/skills/user/spec-writing/SKILL.md` |
+| **database-management** | Tietokantaskeeman ylläpito | `Lue /mnt/skills/user/database-management/SKILL.md` |
+| **testing** | TDD, testiskenaariot | `Lue /mnt/skills/user/testing/SKILL.md` |
+| **market-research** | Phase 0, markkinatutkimus | `Lue /mnt/skills/user/market-research/SKILL.md` |
 
-```markdown
-## Liittyvät dokumentit
+### Milloin käyttää mitäkin skilliä:
+
+| Tilanne | Käytä |
+|---------|-------|
+| **Arkkitehtuuripäätös** | `systems-architecture` skill |
+| **RESEARCH/SPEC-dokumentti** | Prosessiohje + `spec-writing` skill |
+| **Tallennus GitHubiin** | `document-updates` skill |
+| **Tietokantamuutos** | `database-management` skill |
+| **Testien kirjoitus** | `testing` skill |
+
+---
+
+## 📋 TEMPLATET
+
+**Sijainti:** `docs/templates/`
+
+| Template | Käyttö |
+|----------|--------|
+| `RESEARCH_TEMPLATE.md` | RESEARCH_*.md dokumenttien pohja |
+| `SPEC_TEMPLATE.md` | Toiminnallinen määrittely |
+| `TECH_SPEC_TEMPLATE.md` | Tekninen määrittely |
+| `TECH_RESEARCH_TEMPLATE.md` | Tekninen tutkimus |
+| `BRIEFING_TEMPLATE.md` | Claude Code -briefing |
+
+---
+
+## 📊 Dokumenttien statukset
+
+| Status | Merkitys |
+|--------|----------|
+| ✅ | Valmis / Hyväksytty |
+| 🔄 | Työn alla / Seuraava |
+| ⏳ | Odottaa / Ei aloitettu |
+| ❌ | Hylätty / Vanhentunut |
+
+---
+
+## 🎯 Moduulit ja niiden status
+
+<!-- PÄIVITÄ PROJEKTIKOHTAISESTI -->
+
+| Moduuli | SPEC | TECH_SPEC | Koodi | Testit |
+|---------|------|-----------|-------|--------|
+| [Moduuli 1] | ⏳ | ⏳ | ⏳ | ⏳ |
+| [Moduuli 2] | ⏳ | ⏳ | ⏳ | ⏳ |
+| [Moduuli 3] | ⏳ | ⏳ | ⏳ | ⏳ |
+
+---
+
+## 🚀 Pikaoppaat
+
+### Session aloitus (PAKOLLINEN)
+```
+1. LUE INDEX (tämä dokumentti)
+   → Tiedät mitä prosesseja/skillejä on käytettävissä
+
+2. LUE KEHITYSLOKI
+   → Tiedät missä mennään ja mitä seuraavaksi
+
+3. git status (Windows)
+   → Onko uncommitted muutoksia?
+
+4. Kysy käyttäjältä tavoite
+```
+
+### RESEARCH-dokumentin kirjoitus
+```
+1. LUE docs/process/PROCESS_Research_Methodology.md
+2. KOPIOI docs/templates/RESEARCH_TEMPLATE.md
+3. LATAA skill: systems-architecture (jos arkkitehtuuripäätös)
+4. SEURAA prosessia
+5. TALLENNA: lataa document-updates skill
+```
+
+### SPEC-dokumentin kirjoitus
+```
+1. LUE docs/process/PROCESS_SPEC_Writing.md
+2. KOPIOI docs/templates/SPEC_TEMPLATE.md tai TECH_SPEC_TEMPLATE.md
+3. SEURAA 11-vaiheista prosessia
+4. TALLENNA: lataa document-updates skill
+```
+
+### Arkkitehtuuripäätös
+```
+1. LATAA skill: systems-architecture
+2. KÄYTÄ checklist:
+   - Primitiivi tunnistettu?
+   - Black box -rajat selkeät?
+   - Voidaanko vaihtaa myöhemmin?
+3. DOKUMENTOI päätös
+```
+
+---
+
+## 🔗 Liittyvät dokumentit
 
 | Dokumentti | Yhteys |
 |------------|--------|
-| PROCESS_X.md | Miten liittyy |
-| SPEC_XX.md | Miten liittyy |
-```
+| SYSTEM_PROMPT.md | Projektin ohjeet |
+| KEHITYSLOKI.md | Edistymisen seuranta |
+| MASTER_FUNCTIONAL.md | Toiminnallinen kokonaiskuva |
 
 ---
 
@@ -196,18 +212,9 @@ Jokaisen dokumentin loppuun tulee taulukko:
 
 | Versio | Päivämäärä | Muutokset |
 |--------|------------|-----------|
+| 1.1 | 2025-12-18 | Lisätty kattava prosessi- ja skill-lista, pikaoppaat |
 | 1.0 | [PÄIVÄMÄÄRÄ] | Ensimmäinen versio |
 
 ---
 
-## Liittyvät dokumentit
-
-| Dokumentti | Yhteys |
-|------------|--------|
-| **System Prompt** | Skill-triggerit ja säännöt |
-| **KEHITYSLOKI** | Projektin edistyminen |
-| **MASTER_FUNCTIONAL** | Moduulistatukset |
-
----
-
-*Dokumentti on osa [PROJEKTIN NIMI] -projektin dokumentaatiota.*
+*Päivitä tätä dokumenttia kun lisäät uusia tiedostoja!*
