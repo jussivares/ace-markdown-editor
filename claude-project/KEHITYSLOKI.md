@@ -11,10 +11,10 @@
 ## Projektin vaihe
 
 ```
-[██░░░░░░░░] 20% - Määrittelyvaihe
+[████░░░░░░] 40% - Tekninen suunnittelu valmis
 ```
 
-**Nykyinen fokus:** SPEC valmis, seuraavaksi TECH_SPEC
+**Nykyinen fokus:** TECH_SPEC valmis, seuraavaksi koodaus (Task-01)
 
 ---
 
@@ -25,8 +25,8 @@
 | Vaihe | Fokus | Tehtävä | Status |
 |:-----:|-------|---------|:------:|
 | **1** | Määrittely | SPEC_01 - Toiminnallinen määrittely | ✅ |
-| **2** | Tekninen suunnittelu | TECH_SPEC_01 - Tekninen määrittely | ▶ |
-| **3** | Foundation | Perusrakenne, CodeMirror, layout | 🔲 |
+| **2** | Tekninen suunnittelu | TECH_SPEC_01 - Tekninen määrittely | ✅ |
+| **3** | Foundation | Perusrakenne, CodeMirror, layout | ▶ |
 | **4** | Core features | Preview, storage, note management | 🔲 |
 | **5** | Polish | Export, theming, edge cases | 🔲 |
 
@@ -34,17 +34,16 @@
 
 ## Seuraava sessio
 
-**Vaihe: 2 - Tekninen suunnittelu**
+**Vaihe: 3 - Foundation (Koodaus alkaa)**
 
 ### Tehtävät:
 
-| # | Tehtävä | Status |
-|:-:|---------|:------:|
-| 1 | TECH_SPEC_01 kirjoitus | 🔲 |
-| 2 | Tiedostorakenteen suunnittelu | 🔲 |
-| 3 | CodeMirror 6 -konfiguraation määrittely | 🔲 |
-| 4 | CSS-arkkitehtuuri (theming, responsive) | 🔲 |
-| 5 | Print CSS (PDF export) | 🔲 |
+| # | Tehtävä | Arvio | Status |
+|:-:|---------|:-----:|:------:|
+| 1 | Task-01: Projektin perusrakenne | 1h | 🔲 |
+| 2 | Task-02: CSS Variables & Theming | 2h | 🔲 |
+| 3 | Task-06: Storage Module | 2h | 🔲 |
+| 4 | Task-03: Layout Foundation | 4h | 🔲 |
 
 ---
 
@@ -66,6 +65,39 @@
 ## Sessiohistoria
 
 <!-- UUSIN SESSIO AINA YLIMMÄKSI -->
+
+### Session #2 (2026-01-05) - TECH_SPEC ja arkkitehtuuri
+
+**Tavoite:** Kirjoittaa tekninen määrittely ja päättää arkkitehtuuri
+
+**Saavutukset:**
+
+- ✅ TECH_SPEC_01_ACE_Markdown_Editor.md kirjoitettu (1086 riviä)
+- ✅ 10 taskia määritelty (27h arvio MVP)
+- ✅ 60+ test scenariota kirjoitettu
+- ✅ Traceability Matrix täydennetty (kaikki 45 AC linkitetty taskeihin)
+- ✅ CSS-arkkitehtuuri suunniteltu (variables, responsive breakpoints)
+- ✅ Event bus -arkkitehtuuri dokumentoitu
+
+**Arkkitehtuuripäätökset:**
+
+| Päätös | Valinta | Perustelu |
+|--------|---------|-----------|
+| Moduulirakenne | 5 black box moduulia | Vaihdettavuus, selkeys |
+| Kytkentä | Event bus + callbacks | Löyhä kytkentä, testattavuus |
+| Ulkoiset kirjastot | Aina wrapataan | Platform layer -periaate |
+| CSS | Custom properties | Teeman vaihto ilman JS |
+| Testaus | Manuaalinen | Pieni projekti, UI-intensiivinen |
+
+**Keskustelu:**
+- Selvennettiin SPEC-prosessin "moduuli" vs arkkitehtuurin "moduuli" -ero
+- Moduuli SPECissä = dokumentaation organisointi
+- Moduuli arkkitehtuurissa = black box -komponentti
+- Päätettiin käyttää kevyt modulaarinen arkkitehtuuri (callbacks, ei events overkill)
+
+**Commitit:** `[pending]`
+
+---
 
 ### Session #1 (2026-01-05) - Projektin perustaminen ja SPEC
 
@@ -98,7 +130,7 @@
 
 | Moduuli | SPEC | TECH_SPEC | CODE | TEST |
 |---------|:----:|:---------:|:----:|:----:|
-| ACE Markdown Editor | ✅ | ▶ | 🔲 | 🔲 |
+| ACE Markdown Editor | ✅ | ✅ | ▶ | 🔲 |
 
 **Symbolit:** ✅ Valmis | 🔶 Työn alla | 🔲 Ei aloitettu | ▶ Seuraava
 
@@ -142,13 +174,15 @@
 | CodeMirror 5 vs 6? | CM6 (parempi touch) | #1 |
 | PDF export -toteutus? | window.print() + print CSS | #1 |
 | Autosave vs manual? | Molemmat (autosave + save-nappi) | #1 |
+| Testausstrategia? | Manuaalinen (pieni projekti, UI-intensiivinen) | #2 |
+| Bundle vai ES modules? | ES modules (esm.sh CDN) | #2 |
+| Moduulien kytkentä? | Event bus + callbacks | #2 |
 
 ### Avoin 🔲
 
 | Kysymys | Prioriteetti | Huom |
 |---------|--------------|------|
-| Testausstrategia? | P2 | Manuaalinen vs Playwright |
-| Bundle vai ES modules? | P1 | Ratkaistava TECH_SPEC:ssä |
+| - | - | Ei avoimia kysymyksiä |
 
 ---
 
@@ -158,6 +192,8 @@
 |--------|------|------------|
 | #1 | GitHub CLI vaatii kirjautumisen tai tokenin | Token toimii: `$env:GH_TOKEN="..."` |
 | #1 | PowerShell käyttää `;` eikä `&&` | Muista syntaksi |
+| #2 | "Moduuli" on kontekstiriippuvainen termi | SPEC: dokumentaation organisointi, Arkkitehtuuri: black box |
+| #2 | Wrapper-periaate kriittinen | Kaikki ulkoiset kirjastot wrapataan |
 
 ---
 

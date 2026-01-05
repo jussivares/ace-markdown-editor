@@ -46,8 +46,8 @@ ace-markdown-editor/
 | Dokumentti | Status | Sijainti |
 |------------|--------|----------|
 | SPEC_01 (toiminnallinen) | ✅ Valmis | `docs/SPEC_01_ACE_Markdown_Editor.md` |
-| TECH_SPEC_01 (tekninen) | ⏳ Seuraava | - |
-| Koodi | ⏳ Odottaa | `src/` |
+| TECH_SPEC_01 (tekninen) | ✅ Valmis | `docs/TECH_SPEC_01_ACE_Markdown_Editor.md` |
+| Koodi | ⏳ Seuraava | `src/` |
 
 ---
 
