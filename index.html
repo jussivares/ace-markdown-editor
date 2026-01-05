@@ -48,6 +48,12 @@
       </button>
       <h1>ACE Markdown Editor</h1>
       <div class="toolbar-spacer"></div>
+      <button id="export-html-btn" class="btn btn-secondary" aria-label="Export HTML" title="Export HTML">
+        <span>HTML</span>
+      </button>
+      <button id="export-pdf-btn" class="btn btn-secondary" aria-label="Export PDF" title="Export PDF">
+        <span>PDF</span>
+      </button>
       <button id="theme-toggle" class="btn btn-secondary theme-toggle" aria-label="Toggle theme">
         <span class="theme-icon-light">☀️</span>
         <span class="theme-icon-dark">🌙</span>
@@ -59,9 +65,13 @@
 
     <main class="main-layout" data-mode="edit">
       <aside class="sidebar" id="sidebar">
-        <!-- Note list - Task-07 -->
-        <div style="padding: var(--spacing-md); color: var(--color-text-secondary);">
-          Notes will appear here
+        <div class="sidebar-header">
+          <button id="new-note-btn" class="btn btn-primary new-note-btn">
+            <span>+</span> New Note
+          </button>
+        </div>
+        <div class="note-list" id="note-list">
+          <!-- Notes rendered dynamically -->
         </div>
       </aside>
 

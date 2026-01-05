@@ -128,3 +128,109 @@
 .toolbar-spacer {
   flex: 1;
 }
+
+/* === Sidebar Components === */
+
+.sidebar-header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.new-note-btn {
+  width: 100%;
+  justify-content: center;
+  gap: var(--spacing-xs);
+}
+
+.note-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.note-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-fast);
+  gap: var(--spacing-sm);
+}
+
+.note-item:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+.note-item.active {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.note-item.active .note-date {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.note-item-content {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.note-title {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-date {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.note-delete-btn {
+  opacity: 0;
+  padding: var(--spacing-xs);
+  min-width: 32px;
+  min-height: 32px;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: opacity var(--transition-fast), background-color var(--transition-fast);
+}
+
+.note-item:hover .note-delete-btn {
+  opacity: 1;
+}
+
+.note-delete-btn:hover {
+  background-color: var(--color-error);
+  color: white;
+}
+
+.note-item.active .note-delete-btn {
+  color: white;
+}
+
+.note-item.active .note-delete-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Empty state */
+.note-list-empty {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Touch devices - always show delete button */
+@media (pointer: coarse) {
+  .note-delete-btn {
+    opacity: 1;
+  }
+}

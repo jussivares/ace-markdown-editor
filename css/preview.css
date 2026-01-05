@@ -19,6 +19,11 @@
   line-height: 1.3;
 }
 
+/* First element should not have top margin */
+.preview-pane > :first-child {
+  margin-top: 0;
+}
+
 .preview-pane h1 { font-size: 2em; }
 .preview-pane h2 { font-size: 1.5em; }
 .preview-pane h3 { font-size: 1.25em; }
