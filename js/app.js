@@ -10,6 +10,29 @@ import { Exporter } from './export.js';
 import { UI } from './ui.js';
 import { debounce } from './utils.js';
 
+// === Note Emoji Palette ===
+// Cozy/creative vibes - variety for visual interest
+const NOTE_EMOJIS = [
+  '📝', '✏️', '📒', '📓', '📔', '📕', '📖', '📚',
+  '💡', '✨', '🎯', '🎨', '🖊️', '📌', '🗒️', '💭',
+  '🌟', '🔖', '📎', '🗂️', '✍️', '💫', '🌸', '🍂'
+];
+
+/**
+ * Get consistent emoji for note (based on id hash)
+ * Same note always gets same emoji
+ * @param {string} noteId
+ * @returns {string}
+ */
+function getNoteEmoji(noteId) {
+  let hash = 0;
+  for (let i = 0; i < noteId.length; i++) {
+    hash = ((hash << 5) - hash) + noteId.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return NOTE_EMOJIS[Math.abs(hash) % NOTE_EMOJIS.length];
+}
+
 // === Event Bus ===
 
 const events = {
@@ -478,7 +501,7 @@ function renderNoteList(container) {
 
   container.innerHTML = state.notes.map(note => `
     <div class="note-item${note.id === state.currentNoteId ? ' active' : ''}" data-note-id="${note.id}">
-      <div class="note-emoji">📝</div>
+      <div class="note-emoji">${getNoteEmoji(note.id)}</div>
       <div class="note-item-content">
         <div class="note-title">${escapeHtml(note.title)}</div>
         <div class="note-preview">${escapeHtml(extractPreview(note.content))}</div>
