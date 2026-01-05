@@ -444,6 +444,24 @@ function extractTitle(content) {
   return 'Untitled Note';
 }
 
+/**
+ * Extract preview text from content (first non-title line)
+ * @param {string} content
+ * @returns {string}
+ */
+function extractPreview(content) {
+  const lines = content.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    // Skip empty lines and title lines
+    if (trimmed.length === 0) continue;
+    if (trimmed.startsWith('#')) continue;
+    // Return first content line, truncated
+    return trimmed.slice(0, 60) + (trimmed.length > 60 ? '...' : '');
+  }
+  return '';
+}
+
 // === Note List Rendering ===
 
 /**
@@ -454,14 +472,16 @@ function renderNoteList(container) {
   if (!container) return;
 
   if (state.notes.length === 0) {
-    container.innerHTML = '<div class="note-list-empty">No notes yet.<br>Click "New Note" to start.</div>';
+    container.innerHTML = '<div class="note-list-empty">No notes yet<br><span style="font-size: var(--font-size-xs);">Click + New Note to create one</span></div>';
     return;
   }
 
   container.innerHTML = state.notes.map(note => `
     <div class="note-item${note.id === state.currentNoteId ? ' active' : ''}" data-note-id="${note.id}">
+      <div class="note-emoji">📝</div>
       <div class="note-item-content">
         <div class="note-title">${escapeHtml(note.title)}</div>
+        <div class="note-preview">${escapeHtml(extractPreview(note.content))}</div>
         <div class="note-date">${formatDate(note.updatedAt)}</div>
       </div>
       <button class="note-delete-btn" data-note-id="${note.id}" aria-label="Delete note">✕</button>

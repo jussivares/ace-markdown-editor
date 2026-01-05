@@ -6,8 +6,6 @@
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
   color: var(--color-text-primary);
-  max-width: var(--content-max-width);
-  margin: 0 auto;
 }
 
 /* === Headings === */

@@ -201,6 +201,16 @@
   border-radius: var(--radius-xl);
 }
 
+/* Sidebar section header */
+.sidebar-section-header {
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .note-list {
   overflow-y: auto;
   flex: 1;
@@ -260,6 +270,31 @@
 .note-date {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
+}
+
+/* Note emoji icon */
+.note-emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 28px;
+  text-align: center;
+  padding-top: 2px;
+}
+
+/* Note preview text */
+.note-preview {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: var(--space-1);
+  margin-bottom: var(--space-1);
+}
+
+.note-item.active .note-preview {
+  color: var(--color-text-secondary);
 }
 
 .note-delete-btn {
