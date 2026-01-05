@@ -1,8 +1,10 @@
 # TECH_SPEC_01: ACE Markdown Editor
 
-> **Versio:** 1.0  
-> **Päivitetty:** 2026-01-05  
-> **Status:** Draft  
+> **Versio:** 1.2
+> **Päivitetty:** 2026-01-05
+> **Status:** Draft
+> **Gemini Review:** 2026-01-05 (5 löydöstä, kaikki käsitelty)
+> **Claude Review:** 2026-01-05 (3 kriittistä virhettä korjattu, state flow lisätty)
 > **Perustuu:** SPEC_01_ACE_Markdown_Editor.md
 
 ---
@@ -56,17 +58,71 @@ ACE Markdown Editor on selainpohjainen muistiinpanosovellus, joka koostuu viides
  */
 ```
 
-### 1.4 Riippuvuudet (CDN)
+**Note Edge Cases (Gemini Finding #5):**
+
+| Tilanne | Käyttäytyminen |
+|---------|----------------|
+| Uusi note ilman otsikkoa | `title = 'Untitled Note'` |
+| Otsikko > 100 merkkiä | Katkaistaan: `title.slice(0, 100)` |
+| Ensimmäinen käynnistys, ei noteja | Näytetään tyhjätila + "Create your first note" |
+| `lastOpenNoteId` ei löydy | Avataan uusin note (`notes[0]`) tai tyhjätila |
+
+### 1.4 Riippuvuudet (CDN) - Versiolukitut (Gemini Finding #1)
 
 | Kirjasto | Versio | CDN | Käyttötarkoitus |
 |----------|--------|-----|-----------------|
-| @codemirror/view | 6.x | esm.sh | Editor-ydin |
-| @codemirror/state | 6.x | esm.sh | Editor state management |
-| @codemirror/lang-markdown | 6.x | esm.sh | Markdown syntax highlighting |
-| @codemirror/theme-one-dark | 6.x | esm.sh | Dark theme |
-| marked | 9.x | cdnjs | Markdown → HTML |
-| highlight.js | 11.x | cdnjs | Code syntax highlighting |
-| DOMPurify | 3.x | cdnjs | XSS sanitization |
+| codemirror | 6.0.1 | esm.sh | Editor basicSetup |
+| @codemirror/view | 6.35.0 | esm.sh | Editor-ydin |
+| @codemirror/state | 6.5.0 | esm.sh | Editor state management |
+| @codemirror/lang-markdown | 6.3.1 | esm.sh | Markdown syntax highlighting |
+| @codemirror/theme-one-dark | 6.1.2 | esm.sh | Dark theme |
+| marked | 15.0.6 | esm.sh | Markdown → HTML |
+| marked-highlight | 2.2.1 | esm.sh | highlight.js integraatio marked:iin |
+| highlight.js | 11.11.1 | esm.sh | Code syntax highlighting |
+| DOMPurify | 3.2.4 | esm.sh | XSS sanitization |
+
+**Import Map (index.html):**
+
+```html
+<script type="importmap">
+{
+  "imports": {
+    "codemirror": "https://esm.sh/codemirror@6.0.1",
+    "@codemirror/view": "https://esm.sh/@codemirror/view@6.35.0",
+    "@codemirror/state": "https://esm.sh/@codemirror/state@6.5.0",
+    "@codemirror/lang-markdown": "https://esm.sh/@codemirror/lang-markdown@6.3.1",
+    "@codemirror/theme-one-dark": "https://esm.sh/@codemirror/theme-one-dark@6.1.2",
+    "marked": "https://esm.sh/marked@15.0.6",
+    "marked-highlight": "https://esm.sh/marked-highlight@2.2.1",
+    "highlight.js": "https://esm.sh/highlight.js@11.11.1",
+    "dompurify": "https://esm.sh/dompurify@3.2.4"
+  }
+}
+</script>
+```
+
+**HUOM:** Kaikki kirjastot ladataan esm.sh:sta yhtenäisyyden vuoksi. `marked-highlight` tarvitaan highlight.js-integraatioon (marked v5.0+ ei tue enää sisäänrakennettua `highlight`-optiota).
+
+**CDN Error Handling:**
+
+```javascript
+// app.js - graceful degradation
+async function loadDependencies() {
+  try {
+    const modules = await Promise.all([
+      import('@codemirror/view'),
+      import('marked'),
+      import('dompurify')
+    ]);
+    return modules;
+  } catch (err) {
+    showFatalError('Failed to load editor. Please check your internet connection and refresh.');
+    throw err;
+  }
+}
+```
+
+**V2 Roadmap:** Service Worker offline-tukeen.
 
 ---
 
@@ -262,6 +318,7 @@ export class Storage {
 ```javascript
 /**
  * Export wrapper - HTML ja PDF
+ * Gemini Finding #3: Käyttää iframe-tekniikkaa PDF:lle
  */
 export class Exporter {
   /**
@@ -276,10 +333,50 @@ export class Exporter {
   exportHTML(note) {}
   
   /**
-   * Avaa print-dialogin PDF-vientiä varten
+   * Vie noten PDF:nä käyttäen hidden iframe -tekniikkaa.
+   * Tämä varmistaa että oikea note tulostetaan riippumatta
+   * siitä mikä note on avoinna editorissa.
    * @param {Note} note
    */
   exportPDF(note) {}
+  
+  /**
+   * Generoi täydellisen print-ready HTML:n
+   * @param {Note} note
+   * @returns {string} HTML dokumentti inline-tyyleillä
+   * @private
+   */
+  _generatePrintHTML(note) {}
+}
+```
+
+**PDF Export Implementation (iframe-tekniikka):**
+
+```javascript
+exportPDF(note) {
+  // 1. Luo hidden iframe
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'position:absolute;left:-9999px;width:0;height:0;';
+  document.body.appendChild(iframe);
+  
+  // 2. Generoi HTML tälle notelle (ei nykyiselle näkymälle)
+  const html = this._generatePrintHTML(note);
+  
+  // 3. Kirjoita iframeen
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(html);
+  doc.close();
+  
+  // 4. Odota renderöintiä, sitten tulosta
+  iframe.contentWindow.onload = () => {
+    iframe.contentWindow.print();
+  };
+  
+  // 5. Siivoa tulostuksen jälkeen
+  iframe.contentWindow.onafterprint = () => {
+    document.body.removeChild(iframe);
+  };
 }
 ```
 
@@ -372,7 +469,16 @@ const events = {
 export const bus = {
   on(event, callback) { events[event].push(callback); },
   off(event, callback) { events[event] = events[event].filter(cb => cb !== callback); },
-  emit(event, ...args) { events[event].forEach(cb => cb(...args)); }
+  emit(event, ...args) { 
+    // Gemini Review: try-catch estää yhden subscriberin kaatamasta koko bussia
+    events[event]?.forEach(cb => {
+      try {
+        cb(...args);
+      } catch (err) {
+        console.error(`Event handler error [${event}]:`, err);
+      }
+    });
+  }
 };
 ```
 
@@ -400,6 +506,115 @@ bus.emit('editor:change', content)
                     └──► UI.showToast('Saved')
                          NoteList.update()
 ```
+
+---
+
+## 5.1 Application State (Claude Review)
+
+Sovelluksen tila on keskitetty `app.js`:ään:
+
+```javascript
+// app.js - Application State
+const state = {
+  currentNoteId: null,      // Avoinna oleva note (null = ei mitään)
+  notes: [],                // Kaikki notet (synkronoitu storage:n kanssa)
+  isDirty: false,           // Onko tallentamattomia muutoksia
+  autosaveTimer: null,      // Debounce timer ID
+};
+```
+
+### State Flow: Note Selection
+
+```
+User klikkaa notea listassa
+        │
+        ▼
+bus.emit('note:select', id)
+        │
+        ├──► [1] Tarkista isDirty
+        │         │
+        │         ├─ true → Tallenna nykyinen note ensin
+        │         │              │
+        │         │              ▼
+        │         │         Storage.saveNote(currentNote)
+        │         │              │
+        │         │              ▼
+        │         │         isDirty = false
+        │         │              │
+        │         └─ false ──────┘
+        │                        │
+        │                        ▼
+        ├──► [2] Lataa uusi note
+        │         │
+        │         ▼
+        │    note = Storage.getNote(id)
+        │         │
+        │         ▼
+        │    currentNoteId = id
+        │         │
+        │         ▼
+        ├──► [3] Päivitä UI
+        │         │
+        │         ├──► Editor.setValue(note.content)
+        │         │
+        │         ├──► Preview.render(note.content)
+        │         │
+        │         └──► NoteList.setActive(id)
+        │
+        └──► [4] Tallenna lastOpenNoteId
+                  │
+                  ▼
+             Storage.updateSettings({ lastOpenNoteId: id })
+```
+
+### State Flow: Autosave vs Manual Save
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    SAVE LOGIC                                    │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Editor.onChange(content)                                        │
+│        │                                                         │
+│        ▼                                                         │
+│  isDirty = true                                                  │
+│  UI.showUnsavedIndicator()                                       │
+│        │                                                         │
+│        ▼                                                         │
+│  clearTimeout(autosaveTimer)  ← Peruuta edellinen               │
+│        │                                                         │
+│        ▼                                                         │
+│  autosaveTimer = setTimeout(save, 2500)  ← Uusi timer           │
+│        │                                                         │
+│        │                                                         │
+│        │    ┌─────────────────────────────────┐                 │
+│        │    │  User klikkaa "Save" -nappia    │                 │
+│        │    └─────────────────────────────────┘                 │
+│        │                  │                                      │
+│        │                  ▼                                      │
+│        │         clearTimeout(autosaveTimer)                     │
+│        │                  │                                      │
+│        └──────────────────┼──────────────────┘                  │
+│                           │                                      │
+│                           ▼                                      │
+│                    save() function                               │
+│                           │                                      │
+│                           ▼                                      │
+│                  Storage.saveNote(note)                          │
+│                           │                                      │
+│                           ▼                                      │
+│                  isDirty = false                                 │
+│                  UI.hideUnsavedIndicator()                       │
+│                  UI.showToast('Saved')                           │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Kriittiset säännöt:**
+
+1. **Manual Save peruuttaa autosaven** - Kun käyttäjä painaa Save, `clearTimeout(autosaveTimer)` estää tupla-tallennuksen
+2. **Note switch tallentaa ensin** - Ennen uuden noten latausta tallennetaan dirty note
+3. **isDirty gatekeeping** - Kaikki tallennukset kulkevat saman logiikan läpi
 
 ---
 
@@ -522,11 +737,53 @@ CodeMirror 6 wrapper joka lataa CM6:n ESM-moduuleina esm.sh:sta.
 | TS-04.11 | EC | 100k merkin sisältö → editor pysyy responsiivisena |
 
 **Implementation Notes:**
+
 ```javascript
-import { EditorView, basicSetup } from 'https://esm.sh/@codemirror/basic-setup'
-import { markdown } from 'https://esm.sh/@codemirror/lang-markdown'
-import { oneDark } from 'https://esm.sh/@codemirror/theme-one-dark'
+// Importit (import map kautta)
+import { EditorView, keymap } from '@codemirror/view';
+import { EditorState } from '@codemirror/state';
+import { basicSetup } from 'codemirror';
+import { markdown } from '@codemirror/lang-markdown';
+import { oneDark } from '@codemirror/theme-one-dark';
 ```
+
+**HUOM:** `basicSetup` tulee `codemirror`-paketista, EI `@codemirror/basic-setup`:sta (joka ei ole olemassa).
+
+**Theming (Gemini Finding #4 - virallinen EditorView.theme()):**
+
+```javascript
+// Käytetään CM6:n virallista theming-APIa, EI CSS override
+const lightTheme = EditorView.theme({
+  '&': {
+    backgroundColor: 'var(--color-bg-primary)',
+    color: 'var(--color-text-primary)'
+  },
+  '.cm-content': {
+    fontFamily: 'var(--font-mono)',
+    fontSize: 'var(--font-size-base)'
+  },
+  '.cm-cursor': {
+    borderLeftColor: 'var(--color-accent)'
+  },
+  '.cm-activeLine': {
+    backgroundColor: 'var(--color-bg-secondary)'
+  }
+}, { dark: false });
+
+const darkTheme = EditorView.theme({
+  // Sama rakenne, mutta dark: true
+}, { dark: true });
+
+// Teeman vaihto reconfigure:lla
+setTheme(theme) {
+  const newTheme = theme === 'dark' ? darkTheme : lightTheme;
+  this.view.dispatch({
+    effects: this.themeCompartment.reconfigure(newTheme)
+  });
+}
+```
+
+**Huom:** `editor.css` sisältää vain container-tyylit, EI CM6-overrideja.
 
 ---
 
@@ -554,16 +811,30 @@ Preview wrapper joka renderöi Markdownin turvallisesti HTML:ksi.
 | TS-05.9 | EC | Tyhjä sisältö → tyhjä preview |
 
 **Implementation Notes:**
+
 ```javascript
-import { marked } from 'https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js'
-import DOMPurify from 'https://cdn.jsdelivr.net/npm/dompurify/dist/purify.es.mjs'
-import hljs from 'https://cdn.jsdelivr.net/gh/nicognaW/hljs-esm/+esm'
+// Importit (import map kautta)
+import { marked } from 'marked';
+import { markedHighlight } from 'marked-highlight';
+import hljs from 'highlight.js';
+import DOMPurify from 'dompurify';
 
-marked.setOptions({
-  highlight: (code, lang) => hljs.highlightAuto(code, lang ? [lang] : undefined).value
-});
+// Konfiguroi marked käyttämään highlight.js:ää
+// HUOM: marked v5.0+ ei tue sisäänrakennettua highlight-optiota,
+// siksi käytetään marked-highlight -laajennusta
+marked.use(markedHighlight({
+  langPrefix: 'hljs language-',
+  highlight(code, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      return hljs.highlight(code, { language: lang }).value;
+    }
+    return hljs.highlightAuto(code).value;
+  }
+}));
 
-const clean = DOMPurify.sanitize(marked.parse(markdown));
+// Renderöinti
+const html = marked.parse(markdown);
+const clean = DOMPurify.sanitize(html);
 ```
 
 ---
@@ -682,6 +953,8 @@ Print CSS joka tuottaa 1:1 tuloksen previewn kanssa.
 | TS-09.7 | EC | Pitkä dokumentti → oikeat sivunvaihdot |
 
 **Implementation Notes:**
+
+**Print CSS (print.css):**
 ```css
 @media print {
   .sidebar, .toolbar, .editor-pane { display: none !important; }
@@ -690,6 +963,17 @@ Print CSS joka tuottaa 1:1 tuloksen previewn kanssa.
   code { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 ```
+
+**Iframe-tekniikka (Gemini Finding #3):**
+
+Käytetään hidden iframe -tekniikkaa varmistamaan oikean noten tulostus:
+1. Luo piilotettu iframe
+2. Generoi täydellinen HTML annetulle notelle (ei nykyiselle näkymälle)
+3. Kirjoita HTML iframeen
+4. Kutsu `iframe.contentWindow.print()`
+5. Siivoa iframe tulostuksen jälkeen
+
+Katso `export.js` API-dokumentaatio (Section 4.4) täydellisestä implementaatiosta.
 
 ---
 
@@ -711,6 +995,110 @@ app.js joka yhdistää kaikki moduulit, event bus, lifecycle.
 | TS-10.3 | HP | Jos ei noteja → tyhjä tila + ohje |
 | TS-10.4 | HP | Kaikki eventit kytketty oikein |
 | TS-10.5 | EC | localStorage error → sovellus toimii (ei persistenssiä) |
+
+---
+
+### Task-11: Unit Tests (Vitest TDD) - Gemini Finding #2
+
+**Toteuttaa:** Testikattavuus kriittisille moduuleille  
+**Arvio:** 3h  
+**Prioriteetti:** 🟢 MVP
+
+**Kuvaus:**
+Vitest-pohjainen TDD-testaus kriittisille moduuleille. Noudattaa projektimme PROCESS_Testing.md -ohjeita (RGRC-sykli, Arrange-Act-Assert).
+
+**Test Setup:**
+```javascript
+// vitest.config.js
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./tests/setup.js']
+  }
+});
+
+// tests/setup.js - Mock localStorage
+const localStorageMock = {
+  store: {},
+  getItem: (key) => localStorageMock.store[key] || null,
+  setItem: (key, value) => { localStorageMock.store[key] = value; },
+  removeItem: (key) => { delete localStorageMock.store[key]; },
+  clear: () => { localStorageMock.store = {}; }
+};
+global.localStorage = localStorageMock;
+```
+
+**Test Scenarios:**
+
+| TS-ID | Moduuli | Tyyppi | Skenaario |
+|-------|---------|--------|-----------|
+| TS-11.1 | storage | HP | saveNote → tallentaa ja palauttaa UUID:n |
+| TS-11.2 | storage | HP | getAllNotes → palauttaa listan updatedAt desc |
+| TS-11.3 | storage | HP | deleteNote → poistaa oikean noten |
+| TS-11.4 | storage | HP | saveNote päivittää updatedAt |
+| TS-11.5 | storage | EC | saveNote ilman otsikkoa → 'Untitled Note' |
+| TS-11.6 | storage | EC | saveNote otsikko > 100 merkkiä → katkaistaan |
+| TS-11.7 | storage | ER | Quota exceeded → StorageQuotaError |
+| TS-11.8 | storage | ER | Korruptoitunut JSON → resetoi + varoitus |
+| TS-11.9 | preview | HP | XSS: `<script>` poistetaan |
+| TS-11.10 | preview | HP | XSS: onerror poistetaan |
+| TS-11.11 | preview | HP | XSS: onclick poistetaan |
+| TS-11.12 | preview | HP | Markdown → HTML (perus) |
+| TS-11.13 | utils | HP | generateUUID → validi UUID v4 |
+| TS-11.14 | utils | HP | debounce viivästää kutsua |
+| TS-11.15 | utils | HP | debounce peruuttaa edellisen |
+
+**Esimerkki TDD-testistä (Arrange-Act-Assert):**
+
+```javascript
+// tests/storage.test.js
+import { describe, it, expect, beforeEach } from 'vitest';
+import { Storage } from '../js/storage.js';
+
+describe('Storage', () => {
+  let storage;
+  
+  beforeEach(() => {
+    localStorage.clear();
+    storage = new Storage();
+  });
+  
+  describe('saveNote', () => {
+    // TS-11.1: HP - saveNote tallentaa ja palauttaa UUID:n
+    it('saves note and returns with UUID', () => {
+      // Arrange
+      const note = { title: 'Test', content: '# Hello' };
+      
+      // Act
+      const result = storage.saveNote(note);
+      
+      // Assert
+      expect(result.id).toMatch(/^[0-9a-f-]{36}$/);
+      expect(result.title).toBe('Test');
+    });
+    
+    // TS-11.5: EC - Ilman otsikkoa → 'Untitled Note'
+    it('defaults to Untitled Note when no title', () => {
+      // Arrange
+      const note = { content: 'Some content' };
+      
+      // Act
+      const result = storage.saveNote(note);
+      
+      // Assert
+      expect(result.title).toBe('Untitled Note');
+    });
+  });
+});
+```
+
+**Implementation Notes:**
+- Asennus: `npm install -D vitest jsdom`
+- Ajo: `npm test` (package.json: `"test": "vitest"`)
+- Coverage: `npm run test:coverage`
 
 ---
 
@@ -783,8 +1171,9 @@ app.js joka yhdistää kaikki moduulit, event bus, lifecycle.
 | Task-08 | Export HTML | AC-25,26,27,28 | 2h | 🟢 MVP | Task-05 | 🔲 |
 | Task-09 | Export PDF (Print CSS) | AC-29,30,31,32,33 | 3h | 🟢 MVP | Task-05 | 🔲 |
 | Task-10 | App Orchestration | AC-24 | 2h | 🟢 MVP | Task-04, Task-05, Task-06, Task-07 | 🔲 |
+| Task-11 | Unit Tests (Vitest) | - | 3h | 🟢 MVP | Task-05, Task-06 | 🔲 |
 
-**Yhteensä MVP:** 27h
+**Yhteensä MVP:** 30h (päivitetty Gemini Review jälkeen, +3h testit)
 
 ### Toteutusjärjestys (kriittinen polku)
 
@@ -1052,7 +1441,8 @@ export const testNotes = [
 
 ### Moduulitaso (koko MVP)
 
-- [ ] Kaikki 10 taskia valmiita
+- [ ] Kaikki 11 taskia valmiita
+- [ ] Unit testit läpäisty (Task-11)
 - [ ] iPad 12.9" -testaus läpäisty
 - [ ] Desktop-testaus läpäisty
 - [ ] Mobile-testaus läpäisty
@@ -1067,6 +1457,8 @@ export const testNotes = [
 
 | Versio | Päivämäärä | Muutokset |
 |--------|------------|-----------|
+| 1.2 | 2026-01-05 | **Claude Review -korjaukset:** CM6 import path korjattu (basicSetup tulee codemirror-paketista), marked-highlight lisätty (marked v5.0+ ei tue highlight-optiota), Import Map yhtenäistetty esm.sh:lle, Application State ja State Flow dokumentoitu (5.1), Autosave vs Manual Save -logiikka kuvattu |
+| 1.1 | 2026-01-05 | **Gemini Review -korjaukset:** CDN versiolukitus + import map (#1), Task-11 Unit Tests (#2), PDF iframe-tekniikka (#3), CM6 EditorView.theme() (#4), Note edge cases (#5), Event bus try-catch (bonus) |
 | 1.0 | 2026-01-05 | Ensimmäinen versio |
 
 ---
@@ -1076,6 +1468,7 @@ export const testNotes = [
 | Dokumentti | Yhteys |
 |------------|--------|
 | SPEC_01_ACE_Markdown_Editor.md | Toiminnallinen määrittely |
+| REVIEW_Gemini_TECH_SPEC_01.md | Gemini AI:n arkkitehtuurikatselmointi |
 | INDEX.md | Projektin navigointi |
 | KEHITYSLOKI.md | Edistymisen seuranta |
 

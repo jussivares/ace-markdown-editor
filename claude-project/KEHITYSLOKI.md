@@ -11,10 +11,10 @@
 ## Projektin vaihe
 
 ```
-[████░░░░░░] 40% - Tekninen suunnittelu valmis
+[████░░░░░░] 40% - Tekninen suunnittelu valmis (v1.2)
 ```
 
-**Nykyinen fokus:** TECH_SPEC valmis, seuraavaksi koodaus (Task-01)
+**Nykyinen fokus:** TECH_SPEC v1.2 valmis (Claude Review tehty), seuraavaksi koodaus (Task-01)
 
 ---
 
@@ -65,6 +65,35 @@
 ## Sessiohistoria
 
 <!-- UUSIN SESSIO AINA YLIMMÄKSI -->
+
+### Session #3 (2026-01-05) - Claude Review ja TECH_SPEC v1.2
+
+**Tavoite:** Arkkitehtuurianalyysi ja TECH_SPEC:n laadunvarmistus
+
+**Saavutukset:**
+
+- ✅ Stack-arviointi: Vanilla JS + CM6 + marked + hljs + DOMPurify → HYVÄKSYTTY
+- ✅ Storage-arviointi: localStorage riittää MVP:hen
+- ✅ Gemini Review -käsittelyn validointi: kaikki 5 löydöstä käsitelty oikein
+- ✅ TECH_SPEC v1.2 julkaistu (3 kriittistä virhettä korjattu)
+
+**Löydetyt virheet (korjattu):**
+
+| # | Virhe | Korjaus |
+|---|-------|---------|
+| 1 | CM6 import path väärä (`@codemirror/basic-setup`) | `basicSetup` tulee `codemirror`-paketista |
+| 2 | highlight.js URL-ristiriita (random fork) | Yhtenäistetty esm.sh:lle |
+| 3 | marked v15 highlight-optio vanhentunut | Lisätty `marked-highlight` riippuvuus |
+
+**Lisäykset TECH_SPEC:iin:**
+
+- Section 5.1: Application State
+- State Flow: Note Selection (diagrammi)
+- State Flow: Autosave vs Manual Save (diagrammi)
+
+**Commitit:** `[pending]`
+
+---
 
 ### Session #2 (2026-01-05) - TECH_SPEC ja arkkitehtuuri
 

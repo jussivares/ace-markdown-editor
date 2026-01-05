@@ -46,7 +46,9 @@ ace-markdown-editor/
 | Dokumentti | Status | Sijainti |
 |------------|--------|----------|
 | SPEC_01 (toiminnallinen) | ✅ Valmis | `docs/SPEC_01_ACE_Markdown_Editor.md` |
-| TECH_SPEC_01 (tekninen) | ✅ Valmis | `docs/TECH_SPEC_01_ACE_Markdown_Editor.md` |
+| TECH_SPEC_01 (tekninen) | ✅ Valmis v1.2 | `docs/TECH_SPEC_01_ACE_Markdown_Editor.md` |
+| Gemini Review | ✅ Valmis | `docs/REVIEW_Gemini_TECH_SPEC_01.md` |
+| Claude Review | ✅ Integroitu v1.2:een | (TECH_SPEC muutoshistoria) |
 | Koodi | ⏳ Seuraava | `src/` |
 
 ---
