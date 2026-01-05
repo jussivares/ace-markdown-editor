@@ -40,15 +40,73 @@ export class UI {
 
   // === Theme ===
 
-  /** @param {'light'|'dark'|'system'} theme */
+  /**
+   * Set theme and update DOM + localStorage
+   * @param {'light'|'dark'|'system'} theme
+   */
   setTheme(theme) {
-    // Task-02: Implement
+    const root = document.documentElement;
+
+    // Remove existing theme classes
+    root.classList.remove('light', 'dark');
+
+    // Apply new theme
+    if (theme === 'light') {
+      root.classList.add('light');
+    } else if (theme === 'dark') {
+      root.classList.add('dark');
+    }
+    // 'system' = no class, CSS handles via prefers-color-scheme
+
+    // Save to localStorage
+    try {
+      localStorage.setItem('ace_md_theme', theme);
+    } catch (e) {
+      console.warn('Could not save theme preference');
+    }
+
+    // Callback
+    if (this.options.onThemeChange) {
+      this.options.onThemeChange(this.getActiveTheme());
+    }
   }
 
   /** @returns {'light'|'dark'} Active theme (system resolved) */
   getActiveTheme() {
-    // Task-02: Implement
-    return 'light';
+    const root = document.documentElement;
+
+    if (root.classList.contains('dark')) {
+      return 'dark';
+    }
+    if (root.classList.contains('light')) {
+      return 'light';
+    }
+
+    // System preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  /** @returns {'light'|'dark'|'system'} Stored theme preference */
+  getStoredTheme() {
+    try {
+      return localStorage.getItem('ace_md_theme') || 'system';
+    } catch (e) {
+      return 'system';
+    }
+  }
+
+  /** Toggle between light and dark */
+  toggleTheme() {
+    const current = this.getActiveTheme();
+    this.setTheme(current === 'dark' ? 'light' : 'dark');
+  }
+
+  /** Initialize theme from localStorage */
+  initTheme() {
+    const stored = this.getStoredTheme();
+    if (stored !== 'system') {
+      this.setTheme(stored);
+    }
   }
 
   // === Feedback ===

@@ -90,15 +90,37 @@ async function init() {
     sidebar: document.getElementById('sidebar'),
     editorPane: document.getElementById('editor-pane'),
     previewPane: document.getElementById('preview-pane'),
-    divider: document.getElementById('divider')
+    divider: document.getElementById('divider'),
+    themeToggle: document.getElementById('theme-toggle')
   };
+
+  // Initialize UI (theme)
+  const ui = new UI(elements, {
+    onThemeChange: (theme) => {
+      console.log('Theme changed to:', theme);
+      bus.emit('ui:theme', theme);
+    }
+  });
+
+  // Initialize theme from localStorage
+  ui.initTheme();
+
+  // Theme toggle button
+  if (elements.themeToggle) {
+    elements.themeToggle.addEventListener('click', () => ui.toggleTheme());
+    // Touch support
+    elements.themeToggle.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      ui.toggleTheme();
+    });
+  }
 
   // Initialize modules (Task-10 will wire everything)
   console.log('Modules loaded successfully');
   console.log('- Editor: stub');
   console.log('- Preview: stub');
   console.log('- Storage: stub');
-  console.log('- UI: stub');
+  console.log('- UI: ready (theme)');
 
   // Task-10: Wire up event handlers and initialize full app
 

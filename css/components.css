@@ -91,3 +91,40 @@
   gap: var(--spacing-sm);
   margin-top: var(--spacing-lg);
 }
+
+/* Theme toggle button */
+.theme-toggle {
+  font-size: 1.25rem;
+  padding: var(--spacing-sm);
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Light mode: show sun, hide moon */
+.theme-icon-dark {
+  display: none;
+}
+
+/* Dark mode: show moon, hide sun */
+.dark .theme-icon-light {
+  display: none;
+}
+
+.dark .theme-icon-dark {
+  display: inline;
+}
+
+/* System dark preference (no explicit class) */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not(.dark) .theme-icon-light {
+    display: none;
+  }
+  :root:not(.light):not(.dark) .theme-icon-dark {
+    display: inline;
+  }
+}
+
+/* Toolbar spacer */
+.toolbar-spacer {
+  flex: 1;
+}
