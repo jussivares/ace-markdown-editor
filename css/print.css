@@ -1,0 +1,44 @@
+/* print.css - @media print styles */
+/* Task-09 will finalize PDF export styling */
+
+@media print {
+  /* Hide UI elements */
+  .toolbar,
+  .sidebar,
+  .editor-pane,
+  .divider,
+  .toast-container,
+  .dialog-overlay {
+    display: none !important;
+  }
+
+  /* Full width preview */
+  .main-layout {
+    display: block;
+  }
+
+  .preview-pane {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+  }
+
+  /* Ensure code colors print */
+  pre, code {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Avoid page breaks inside code blocks */
+  pre {
+    page-break-inside: avoid;
+  }
+
+  /* Links show URL */
+  a[href]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: var(--color-text-secondary);
+  }
+}

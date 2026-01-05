@@ -1,0 +1,18 @@
+/* editor.css - CodeMirror container styles */
+/* Task-04 will add CodeMirror integration */
+/* NOTE: CM6 theming via EditorView.theme(), not CSS overrides */
+
+.editor-pane {
+  display: flex;
+  flex-direction: column;
+}
+
+.editor-container {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Container-level styles only - CM6 handles its own theming */
+.cm-editor {
+  height: 100%;
+}

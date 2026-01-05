@@ -1,0 +1,70 @@
+/* layout.css - Grid, Split-pane, Sidebar, Toolbar */
+/* Task-03 will implement full responsive layout */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.toolbar {
+  height: var(--toolbar-height);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-md);
+  background-color: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.toolbar h1 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.main-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr var(--divider-width) 1fr;
+  overflow: hidden;
+}
+
+.sidebar {
+  background-color: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border);
+  overflow-y: auto;
+}
+
+.editor-pane {
+  overflow: hidden;
+  background-color: var(--color-bg-primary);
+}
+
+.divider {
+  background-color: var(--color-border);
+  cursor: col-resize;
+  transition: background-color var(--transition-fast);
+}
+
+.divider:hover {
+  background-color: var(--color-accent);
+}
+
+.preview-pane {
+  overflow-y: auto;
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-primary);
+}
