@@ -1,0 +1,35 @@
+{
+  "name": "ace-markdown-editor",
+  "version": "1.0.0",
+  "description": "iPad-first Markdown notes editor with live preview",
+  "type": "module",
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jussivares/ace-markdown-editor.git"
+  },
+  "keywords": [
+    "markdown",
+    "editor",
+    "notes",
+    "ipad"
+  ],
+  "author": "Jussi Vares",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jussivares/ace-markdown-editor/issues"
+  },
+  "homepage": "https://github.com/jussivares/ace-markdown-editor#readme",
+  "devDependencies": {
+    "dompurify": "^3.3.1",
+    "highlight.js": "^11.11.1",
+    "jsdom": "^27.4.0",
+    "marked": "^17.0.1",
+    "marked-highlight": "^2.2.3",
+    "vitest": "^4.0.16"
+  }
+}
