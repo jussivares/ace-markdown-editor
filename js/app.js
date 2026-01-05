@@ -91,27 +91,73 @@ async function init() {
     editorPane: document.getElementById('editor-pane'),
     previewPane: document.getElementById('preview-pane'),
     divider: document.getElementById('divider'),
-    themeToggle: document.getElementById('theme-toggle')
+    themeToggle: document.getElementById('theme-toggle'),
+    sidebarToggle: document.getElementById('sidebar-toggle'),
+    sidebarOverlay: document.getElementById('sidebar-overlay'),
+    mobileTabs: document.getElementById('mobile-tabs')
   };
 
-  // Initialize UI (theme)
+  // Initialize UI (theme + layout)
   const ui = new UI(elements, {
     onThemeChange: (theme) => {
       console.log('Theme changed to:', theme);
       bus.emit('ui:theme', theme);
+    },
+    onSplitChange: (ratio) => {
+      console.log('Split ratio changed to:', ratio);
+      bus.emit('ui:split', ratio);
+      // Save to storage
+      storage.updateSettings({ splitRatio: ratio });
+    },
+    onSidebarToggle: (isOpen) => {
+      console.log('Sidebar toggled:', isOpen);
+      bus.emit('ui:sidebar', isOpen);
     }
   });
 
   // Initialize theme from localStorage
   ui.initTheme();
 
+  // Load saved split ratio
+  const settings = storage.getSettings();
+  if (settings.splitRatio) {
+    ui.setSplitRatio(settings.splitRatio);
+  }
+
   // Theme toggle button
   if (elements.themeToggle) {
     elements.themeToggle.addEventListener('click', () => ui.toggleTheme());
-    // Touch support
     elements.themeToggle.addEventListener('touchend', (e) => {
       e.preventDefault();
       ui.toggleTheme();
+    });
+  }
+
+  // Sidebar toggle button
+  if (elements.sidebarToggle) {
+    elements.sidebarToggle.addEventListener('click', () => ui.setSidebarCollapsed());
+    elements.sidebarToggle.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      ui.setSidebarCollapsed();
+    });
+  }
+
+  // Sidebar overlay (close on click)
+  if (elements.sidebarOverlay) {
+    elements.sidebarOverlay.addEventListener('click', () => ui.setSidebarCollapsed(true));
+    elements.sidebarOverlay.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      ui.setSidebarCollapsed(true);
+    });
+  }
+
+  // Mobile tabs
+  if (elements.mobileTabs) {
+    elements.mobileTabs.addEventListener('click', (e) => {
+      const tab = e.target.closest('.mobile-tab');
+      if (tab && tab.dataset.mode) {
+        ui.setLayoutMode(tab.dataset.mode);
+      }
     });
   }
 
@@ -119,8 +165,8 @@ async function init() {
   console.log('Modules loaded successfully');
   console.log('- Editor: stub');
   console.log('- Preview: stub');
-  console.log('- Storage: stub');
-  console.log('- UI: ready (theme)');
+  console.log('- Storage: ready');
+  console.log('- UI: ready (theme + layout)');
 
   // Task-10: Wire up event handlers and initialize full app
 

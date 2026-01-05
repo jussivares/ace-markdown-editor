@@ -18,24 +18,165 @@ export class UI {
   constructor(elements, options = {}) {
     this.elements = elements;
     this.options = options;
-    // Task-03: Initialize layout handlers
+    this.currentMode = 'edit';
+    this.splitRatio = 0.5;
+    this.isDragging = false;
+
+    // Sidebar is open by default on tablet/desktop, closed on mobile
+    this.sidebarOpen = this.getBreakpoint() !== 'mobile';
+
+    this._initDividerDrag();
+    this._initBreakpointListener();
   }
 
   // === Layout ===
 
-  /** @param {number} ratio - 0.0-1.0 */
+  /**
+   * Set the split ratio between editor and preview
+   * @param {number} ratio - 0.0-1.0
+   */
   setSplitRatio(ratio) {
-    // Task-03: Implement
+    // Clamp to 20%-80% range
+    this.splitRatio = Math.max(0.2, Math.min(0.8, ratio));
+
+    const mainLayout = document.querySelector('.main-layout');
+    if (mainLayout) {
+      mainLayout.style.setProperty('--split-ratio', this.splitRatio);
+    }
+
+    if (this.options.onSplitChange) {
+      this.options.onSplitChange(this.splitRatio);
+    }
   }
 
-  /** @param {'split'|'edit'|'preview'} mode */
+  /**
+   * Set layout mode (for mobile tabs)
+   * @param {'edit'|'preview'} mode
+   */
   setLayoutMode(mode) {
-    // Task-03: Implement
+    this.currentMode = mode;
+
+    const mainLayout = document.querySelector('.main-layout');
+    if (mainLayout) {
+      mainLayout.setAttribute('data-mode', mode);
+    }
+
+    // Update mobile tab active state
+    const tabs = document.querySelectorAll('.mobile-tab');
+    tabs.forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.mode === mode);
+    });
   }
 
-  /** @param {boolean} collapsed */
+  /**
+   * Toggle or set sidebar collapsed state
+   * @param {boolean} [collapsed] - If undefined, toggles current state
+   */
   setSidebarCollapsed(collapsed) {
-    // Task-03: Implement
+    const sidebar = this.elements.sidebar || document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const mainLayout = document.querySelector('.main-layout');
+
+    if (collapsed === undefined) {
+      // Toggle
+      this.sidebarOpen = !this.sidebarOpen;
+    } else {
+      this.sidebarOpen = !collapsed;
+    }
+
+    if (sidebar) {
+      sidebar.classList.toggle('open', this.sidebarOpen);
+      sidebar.classList.toggle('collapsed', !this.sidebarOpen);
+    }
+
+    if (overlay) {
+      overlay.classList.toggle('visible', this.sidebarOpen && this.getBreakpoint() === 'mobile');
+    }
+
+    if (mainLayout) {
+      mainLayout.classList.toggle('sidebar-collapsed', !this.sidebarOpen);
+    }
+
+    if (this.options.onSidebarToggle) {
+      this.options.onSidebarToggle(this.sidebarOpen);
+    }
+  }
+
+  /**
+   * Initialize divider drag handling
+   * @private
+   */
+  _initDividerDrag() {
+    const divider = this.elements.divider || document.getElementById('divider');
+    if (!divider) return;
+
+    const onStart = (e) => {
+      e.preventDefault();
+      this.isDragging = true;
+      divider.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onEnd);
+      document.addEventListener('touchmove', onMove, { passive: false });
+      document.addEventListener('touchend', onEnd);
+    };
+
+    const onMove = (e) => {
+      if (!this.isDragging) return;
+      e.preventDefault();
+
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const mainLayout = document.querySelector('.main-layout');
+      if (!mainLayout) return;
+
+      const rect = mainLayout.getBoundingClientRect();
+      const sidebar = this.elements.sidebar || document.getElementById('sidebar');
+      const sidebarWidth = sidebar ? sidebar.offsetWidth : 0;
+
+      // Calculate ratio within the editor+preview area
+      const availableWidth = rect.width - sidebarWidth;
+      const relativeX = clientX - rect.left - sidebarWidth;
+      const ratio = relativeX / availableWidth;
+
+      this.setSplitRatio(ratio);
+    };
+
+    const onEnd = () => {
+      this.isDragging = false;
+      divider.classList.remove('dragging');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onEnd);
+      document.removeEventListener('touchmove', onMove);
+      document.removeEventListener('touchend', onEnd);
+    };
+
+    divider.addEventListener('mousedown', onStart);
+    divider.addEventListener('touchstart', onStart, { passive: false });
+  }
+
+  /**
+   * Initialize breakpoint change listener
+   * @private
+   */
+  _initBreakpointListener() {
+    let lastBreakpoint = this.getBreakpoint();
+
+    const checkBreakpoint = () => {
+      const current = this.getBreakpoint();
+      if (current !== lastBreakpoint) {
+        lastBreakpoint = current;
+        if (this._breakpointCallback) {
+          this._breakpointCallback(current);
+        }
+      }
+    };
+
+    window.addEventListener('resize', checkBreakpoint);
   }
 
   // === Theme ===
@@ -137,6 +278,6 @@ export class UI {
 
   /** @param {function(string): void} callback - Called on breakpoint change */
   onBreakpointChange(callback) {
-    // Task-03: Implement with ResizeObserver
+    this._breakpointCallback = callback;
   }
 }

@@ -1,5 +1,5 @@
 /* layout.css - Grid, Split-pane, Sidebar, Toolbar */
-/* Task-03 will implement full responsive layout */
+/* Responsive: Mobile-first approach */
 
 * {
   box-sizing: border-box;
@@ -13,58 +13,272 @@ html, body {
   font-size: var(--font-size-base);
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
+  /* Prevent pull-to-refresh on mobile */
+  overscroll-behavior: none;
 }
 
 #app {
   display: flex;
   flex-direction: column;
   height: 100%;
+  /* Safe area for notched devices */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
+
+/* === Toolbar === */
 
 .toolbar {
   height: var(--toolbar-height);
+  min-height: var(--toolbar-height);
   display: flex;
   align-items: center;
   padding: 0 var(--spacing-md);
   background-color: var(--color-bg-secondary);
   border-bottom: 1px solid var(--color-border);
+  gap: var(--spacing-sm);
 }
 
 .toolbar h1 {
   font-size: var(--font-size-lg);
   font-weight: 600;
+  white-space: nowrap;
 }
+
+/* === Main Layout === */
 
 .main-layout {
   flex: 1;
   display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr var(--divider-width) 1fr;
   overflow: hidden;
+  position: relative;
 }
 
+/* Mobile: Stacked layout with tabs */
+.main-layout {
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+}
+
+/* Hide sidebar on mobile by default */
 .sidebar {
+  display: none;
+  position: fixed;
+  top: var(--toolbar-height);
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 80vw;
   background-color: var(--color-bg-secondary);
   border-right: 1px solid var(--color-border);
   overflow-y: auto;
+  z-index: 100;
+  transform: translateX(-100%);
+  transition: transform var(--transition-normal);
 }
+
+.sidebar.open {
+  display: block;
+  transform: translateX(0);
+}
+
+/* Sidebar overlay for mobile */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  top: var(--toolbar-height);
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+
+.sidebar-overlay.visible {
+  display: block;
+}
+
+/* === Panes === */
 
 .editor-pane {
   overflow: hidden;
   background-color: var(--color-bg-primary);
-}
-
-.divider {
-  background-color: var(--color-border);
-  cursor: col-resize;
-  transition: background-color var(--transition-fast);
-}
-
-.divider:hover {
-  background-color: var(--color-accent);
+  display: flex;
+  flex-direction: column;
 }
 
 .preview-pane {
   overflow-y: auto;
   padding: var(--spacing-md);
   background-color: var(--color-bg-primary);
+  display: none; /* Hidden on mobile, shown via tabs */
+}
+
+/* Mobile: Show only one pane at a time */
+.main-layout[data-mode="edit"] .editor-pane {
+  display: flex;
+}
+
+.main-layout[data-mode="edit"] .preview-pane {
+  display: none;
+}
+
+.main-layout[data-mode="preview"] .editor-pane {
+  display: none;
+}
+
+.main-layout[data-mode="preview"] .preview-pane {
+  display: block;
+}
+
+/* === Divider === */
+
+.divider {
+  display: none; /* Hidden on mobile */
+  background-color: var(--color-border);
+  cursor: col-resize;
+  transition: background-color var(--transition-fast);
+  touch-action: none; /* Prevent scrolling during drag */
+  user-select: none;
+}
+
+.divider:hover,
+.divider.dragging {
+  background-color: var(--color-accent);
+}
+
+/* === Mobile Tabs === */
+
+.mobile-tabs {
+  display: flex;
+  height: 44px;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+}
+
+.mobile-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.mobile-tab.active {
+  color: var(--color-accent);
+  background-color: var(--color-bg-primary);
+}
+
+.mobile-tab:hover {
+  background-color: var(--color-bg-tertiary);
+}
+
+/* === Tablet (≥768px) === */
+
+@media (min-width: 768px) {
+  .sidebar {
+    display: block;
+    position: relative;
+    top: auto;
+    left: auto;
+    bottom: auto;
+    width: var(--sidebar-width);
+    max-width: none;
+    transform: none;
+    z-index: auto;
+  }
+
+  .sidebar.collapsed {
+    width: 0;
+    overflow: hidden;
+    border-right: none;
+  }
+
+  .sidebar-overlay {
+    display: none !important;
+  }
+
+  .main-layout {
+    grid-template-columns: auto 1fr;
+  }
+
+  .mobile-tabs {
+    display: none;
+  }
+
+  /* Show both panes on tablet */
+  .editor-pane,
+  .preview-pane {
+    display: flex;
+  }
+
+  .preview-pane {
+    display: block;
+  }
+}
+
+/* === Desktop (≥1024px) - Split Pane === */
+
+@media (min-width: 1024px) {
+  .main-layout {
+    grid-template-columns: var(--sidebar-width) 1fr var(--divider-width) 1fr;
+  }
+
+  .main-layout.sidebar-collapsed {
+    grid-template-columns: 0 1fr var(--divider-width) 1fr;
+  }
+
+  .divider {
+    display: block;
+    width: var(--divider-width);
+  }
+
+  /* Dynamic split ratio via CSS custom property */
+  .main-layout[style*="--split-ratio"] {
+    grid-template-columns:
+      var(--sidebar-width)
+      calc((100% - var(--sidebar-width) - var(--divider-width)) * var(--split-ratio))
+      var(--divider-width)
+      calc((100% - var(--sidebar-width) - var(--divider-width)) * (1 - var(--split-ratio)));
+  }
+
+  .main-layout.sidebar-collapsed[style*="--split-ratio"] {
+    grid-template-columns:
+      0
+      calc((100% - var(--divider-width)) * var(--split-ratio))
+      var(--divider-width)
+      calc((100% - var(--divider-width)) * (1 - var(--split-ratio)));
+  }
+}
+
+/* === Sidebar Toggle Button === */
+
+.sidebar-toggle {
+  display: flex;
+  padding: var(--spacing-sm);
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@media (min-width: 768px) {
+  .sidebar-toggle {
+    /* Still visible for collapsing sidebar on tablet */
+  }
+}
+
+/* === Utility classes === */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

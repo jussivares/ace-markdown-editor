@@ -1,7 +1,6 @@
 /**
  * storage.js - localStorage wrapper
  * Note entity CRUD operations
- * Task-06 will implement full functionality
  */
 
 import { generateUUID } from './utils.js';
@@ -33,6 +32,17 @@ const DEFAULT_SETTINGS = {
   sidebarCollapsed: false
 };
 
+/**
+ * Custom error for storage quota exceeded
+ */
+export class StorageQuotaError extends Error {
+  constructor() {
+    super('Storage quota exceeded. Delete old notes to continue.');
+    this.name = 'StorageQuotaError';
+    this.code = 'STORAGE_QUOTA';
+  }
+}
+
 export class Storage {
   constructor() {
     this.notesKey = NOTES_KEY;
@@ -41,46 +51,166 @@ export class Storage {
 
   // === Notes ===
 
-  /** @returns {Note[]} All notes sorted by updatedAt (newest first) */
+  /**
+   * Get all notes sorted by updatedAt (newest first)
+   * @returns {Note[]}
+   */
   getAllNotes() {
-    // Task-06: Implement
-    return [];
+    try {
+      const json = localStorage.getItem(this.notesKey);
+      if (!json) return [];
+
+      const notes = JSON.parse(json);
+      // Sort by updatedAt descending
+      return notes.sort((a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
+    } catch (e) {
+      console.error('Storage corrupted, resetting notes:', e);
+      localStorage.removeItem(this.notesKey);
+      return [];
+    }
   }
 
-  /** @param {string} id @returns {Note|null} */
+  /**
+   * Get a single note by ID
+   * @param {string} id
+   * @returns {Note|null}
+   */
   getNote(id) {
-    // Task-06: Implement
-    return null;
+    const notes = this.getAllNotes();
+    return notes.find(note => note.id === id) || null;
   }
 
-  /** @param {Note} note @returns {Note} Saved note with id */
+  /**
+   * Save a note (create or update)
+   * @param {Partial<Note>} note
+   * @returns {Note} Saved note with id and timestamps
+   * @throws {StorageQuotaError} If storage is full
+   */
   saveNote(note) {
-    // Task-06: Implement
-    return note;
+    const notes = this.getAllNotes();
+    const now = new Date().toISOString();
+
+    // Normalize title
+    let title = note.title || 'Untitled Note';
+    if (title.length > 100) {
+      title = title.slice(0, 100);
+    }
+
+    let savedNote;
+
+    if (note.id) {
+      // Update existing note
+      const index = notes.findIndex(n => n.id === note.id);
+      if (index !== -1) {
+        savedNote = {
+          ...notes[index],
+          ...note,
+          title,
+          updatedAt: now
+        };
+        notes[index] = savedNote;
+      } else {
+        // ID provided but not found - create new with that ID
+        savedNote = {
+          id: note.id,
+          title,
+          content: note.content || '',
+          createdAt: now,
+          updatedAt: now
+        };
+        notes.push(savedNote);
+      }
+    } else {
+      // Create new note
+      savedNote = {
+        id: generateUUID(),
+        title,
+        content: note.content || '',
+        createdAt: now,
+        updatedAt: now
+      };
+      notes.push(savedNote);
+    }
+
+    this._saveNotes(notes);
+    return savedNote;
   }
 
-  /** @param {string} id @returns {boolean} */
+  /**
+   * Delete a note by ID
+   * @param {string} id
+   * @returns {boolean} True if note was deleted
+   */
   deleteNote(id) {
-    // Task-06: Implement
-    return false;
+    const notes = this.getAllNotes();
+    const index = notes.findIndex(n => n.id === id);
+
+    if (index === -1) return false;
+
+    notes.splice(index, 1);
+    this._saveNotes(notes);
+    return true;
+  }
+
+  /**
+   * Internal: Save notes array to localStorage
+   * @param {Note[]} notes
+   * @throws {StorageQuotaError}
+   * @private
+   */
+  _saveNotes(notes) {
+    try {
+      localStorage.setItem(this.notesKey, JSON.stringify(notes));
+    } catch (e) {
+      if (e.name === 'QuotaExceededError' || e.code === 22) {
+        throw new StorageQuotaError();
+      }
+      throw e;
+    }
   }
 
   // === Settings ===
 
-  /** @returns {Settings} */
+  /**
+   * Get application settings
+   * @returns {Settings}
+   */
   getSettings() {
-    // Task-06: Implement
-    return { ...DEFAULT_SETTINGS };
+    try {
+      const json = localStorage.getItem(this.settingsKey);
+      if (!json) return { ...DEFAULT_SETTINGS };
+
+      const settings = JSON.parse(json);
+      return { ...DEFAULT_SETTINGS, ...settings };
+    } catch (e) {
+      console.error('Settings corrupted, resetting:', e);
+      localStorage.removeItem(this.settingsKey);
+      return { ...DEFAULT_SETTINGS };
+    }
   }
 
-  /** @param {Partial<Settings>} settings */
+  /**
+   * Update application settings (partial update)
+   * @param {Partial<Settings>} settings
+   */
   updateSettings(settings) {
-    // Task-06: Implement
+    try {
+      const current = this.getSettings();
+      const updated = { ...current, ...settings };
+      localStorage.setItem(this.settingsKey, JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Could not save settings:', e);
+    }
   }
 
   // === Status ===
 
-  /** @returns {boolean} Is localStorage available */
+  /**
+   * Check if localStorage is available
+   * @returns {boolean}
+   */
   isAvailable() {
     try {
       const test = '__storage_test__';
@@ -92,10 +222,25 @@ export class Storage {
     }
   }
 
-  /** @returns {{used: number, available: number}} Storage usage in bytes */
+  /**
+   * Get storage usage information
+   * @returns {{used: number, available: number}} Storage usage in bytes
+   */
   getStorageInfo() {
-    // Task-06: Implement
-    return { used: 0, available: 5 * 1024 * 1024 };
+    let used = 0;
+    try {
+      for (const key in localStorage) {
+        if (localStorage.hasOwnProperty(key)) {
+          used += localStorage.getItem(key).length * 2; // UTF-16
+        }
+      }
+    } catch (e) {
+      // Ignore
+    }
+    return {
+      used,
+      available: 5 * 1024 * 1024 // ~5MB typical limit
+    };
   }
 }
 

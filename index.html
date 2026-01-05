@@ -33,9 +33,11 @@
   </script>
 </head>
 <body>
-  <!-- App Shell - Task-03 will add full layout -->
   <div id="app">
     <header class="toolbar">
+      <button id="sidebar-toggle" class="btn btn-secondary sidebar-toggle" aria-label="Toggle sidebar">
+        <span>☰</span>
+      </button>
       <h1>ACE Markdown Editor</h1>
       <div class="toolbar-spacer"></div>
       <button id="theme-toggle" class="btn btn-secondary theme-toggle" aria-label="Toggle theme">
@@ -44,21 +46,39 @@
       </button>
     </header>
 
-    <main class="main-layout">
+    <!-- Sidebar overlay for mobile -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+    <main class="main-layout" data-mode="edit">
       <aside class="sidebar" id="sidebar">
         <!-- Note list - Task-07 -->
+        <div style="padding: var(--spacing-md); color: var(--color-text-secondary);">
+          Notes will appear here
+        </div>
       </aside>
 
       <section class="editor-pane" id="editor-pane">
         <!-- CodeMirror - Task-04 -->
+        <div style="padding: var(--spacing-md); color: var(--color-text-secondary);">
+          Editor will load here
+        </div>
       </section>
 
       <div class="divider" id="divider"></div>
 
       <section class="preview-pane" id="preview-pane">
         <!-- Markdown preview - Task-05 -->
+        <div style="color: var(--color-text-secondary);">
+          Preview will render here
+        </div>
       </section>
     </main>
+
+    <!-- Mobile tabs -->
+    <nav class="mobile-tabs" id="mobile-tabs">
+      <button class="mobile-tab active" data-mode="edit">Edit</button>
+      <button class="mobile-tab" data-mode="preview">Preview</button>
+    </nav>
   </div>
 
   <!-- App Entry Point -->
