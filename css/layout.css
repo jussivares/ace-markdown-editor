@@ -102,6 +102,7 @@ html, body {
   background-color: var(--color-bg-primary);
   display: flex;
   flex-direction: column;
+  min-height: 0; /* Critical for flex child overflow */
 }
 
 .preview-pane {

@@ -1,18 +1,41 @@
 /* editor.css - CodeMirror container styles */
-/* Task-04 will add CodeMirror integration */
 /* NOTE: CM6 theming via EditorView.theme(), not CSS overrides */
 
 .editor-pane {
   display: flex;
   flex-direction: column;
+  min-height: 0; /* Allow flex child to shrink */
 }
 
 .editor-container {
   flex: 1;
   overflow: hidden;
+  min-height: 0;
 }
 
 /* Container-level styles only - CM6 handles its own theming */
 .cm-editor {
   height: 100%;
+  overflow: auto;
+}
+
+/* Ensure scroller takes full height */
+.cm-editor .cm-scroller {
+  overflow: auto;
+}
+
+/* Gutters (line numbers) visibility - ensure they're not hidden */
+.cm-editor .cm-gutters {
+  min-width: 40px;
+  display: flex !important;
+}
+
+.cm-editor .cm-lineNumbers {
+  display: flex !important;
+}
+
+.cm-editor .cm-lineNumbers .cm-gutterElement {
+  min-width: 32px;
+  padding: 0 8px 0 4px;
+  text-align: right;
 }

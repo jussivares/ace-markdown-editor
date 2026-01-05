@@ -161,16 +161,59 @@ async function init() {
     });
   }
 
-  // Initialize modules (Task-10 will wire everything)
+  // Initialize Preview
+  const preview = new Preview(elements.previewPane);
+
+  // Initialize Editor
+  const editor = new Editor(elements.editorPane, {
+    theme: ui.getActiveTheme(),
+    initialContent: '# Welcome to ACE Markdown Editor\n\nStart typing to see the **live preview**.\n\n## Features\n\n- Real-time preview\n- Syntax highlighting\n- Dark/Light theme\n\n```javascript\nconst hello = "world";\nconsole.log(hello);\n```\n',
+    onChange: (content) => {
+      preview.render(content);
+      bus.emit('editor:change', content);
+    }
+  });
+
+  // Initial render
+  preview.render(editor.getValue());
+
+  // Theme change updates editor theme
+  bus.on('ui:theme', (theme) => {
+    editor.setTheme(theme);
+    updateHljsTheme(theme);
+  });
+
+  // Initialize hljs theme based on current theme
+  updateHljsTheme(ui.getActiveTheme());
+
   console.log('Modules loaded successfully');
-  console.log('- Editor: stub');
-  console.log('- Preview: stub');
+  console.log('- Editor: ready');
+  console.log('- Preview: ready');
   console.log('- Storage: ready');
   console.log('- UI: ready (theme + layout)');
 
-  // Task-10: Wire up event handlers and initialize full app
+  bus.emit('editor:ready');
 
   console.log('ACE Markdown Editor ready');
+}
+
+/**
+ * Update highlight.js theme based on app theme
+ * @param {'light'|'dark'} theme
+ */
+function updateHljsTheme(theme) {
+  const lightLink = document.querySelector('.hljs-theme-light');
+  const darkLink = document.querySelector('.hljs-theme-dark');
+
+  if (lightLink && darkLink) {
+    if (theme === 'dark') {
+      lightLink.disabled = true;
+      darkLink.disabled = false;
+    } else {
+      lightLink.disabled = false;
+      darkLink.disabled = true;
+    }
+  }
 }
 
 // Start app when DOM is ready

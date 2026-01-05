@@ -14,18 +14,26 @@
   <link rel="stylesheet" href="css/preview.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/print.css">
+  <!-- Highlight.js theme -->
+  <link rel="stylesheet" href="https://esm.sh/highlight.js@11.11.1/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link rel="stylesheet" href="https://esm.sh/highlight.js@11.11.1/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="https://esm.sh/highlight.js@11.11.1/styles/github.min.css" class="hljs-theme-light">
+  <link rel="stylesheet" href="https://esm.sh/highlight.js@11.11.1/styles/github-dark.min.css" class="hljs-theme-dark" disabled>
 
   <!-- Import Map for ES Modules -->
+  <!-- Pin @codemirror/state and @codemirror/view versions across all packages -->
   <script type="importmap">
   {
     "imports": {
-      "codemirror": "https://esm.sh/codemirror@6.0.1",
-      "@codemirror/view": "https://esm.sh/@codemirror/view@6.35.0",
       "@codemirror/state": "https://esm.sh/@codemirror/state@6.5.0",
-      "@codemirror/lang-markdown": "https://esm.sh/@codemirror/lang-markdown@6.3.1",
-      "@codemirror/theme-one-dark": "https://esm.sh/@codemirror/theme-one-dark@6.1.2",
+      "@codemirror/view": "https://esm.sh/@codemirror/view@6.35.0?deps=@codemirror/state@6.5.0",
+      "codemirror": "https://esm.sh/codemirror@6.0.1?deps=@codemirror/state@6.5.0,@codemirror/view@6.35.0",
+      "@codemirror/commands": "https://esm.sh/@codemirror/commands@6.7.1?deps=@codemirror/state@6.5.0,@codemirror/view@6.35.0",
+      "@codemirror/language": "https://esm.sh/@codemirror/language@6.10.6?deps=@codemirror/state@6.5.0,@codemirror/view@6.35.0",
+      "@codemirror/lang-markdown": "https://esm.sh/@codemirror/lang-markdown@6.3.1?deps=@codemirror/state@6.5.0,@codemirror/view@6.35.0,@codemirror/language@6.10.6",
+      "@codemirror/theme-one-dark": "https://esm.sh/@codemirror/theme-one-dark@6.1.2?deps=@codemirror/state@6.5.0,@codemirror/view@6.35.0",
       "marked": "https://esm.sh/marked@15.0.6",
-      "marked-highlight": "https://esm.sh/marked-highlight@2.2.1",
+      "marked-highlight": "https://esm.sh/marked-highlight@2.2.1?deps=marked@15.0.6",
       "highlight.js": "https://esm.sh/highlight.js@11.11.1",
       "dompurify": "https://esm.sh/dompurify@3.2.4"
     }
