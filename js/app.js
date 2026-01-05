@@ -77,8 +77,10 @@ let storage, editor, preview, exporter, ui;
 
 // === Initialization ===
 
+const DEBUG = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+
 async function init() {
-  console.log('ACE Markdown Editor initializing...');
+  if (DEBUG) console.log('ACE Markdown Editor initializing...');
 
   // Initialize Storage
   storage = new Storage();
@@ -261,8 +263,10 @@ async function init() {
     }
   });
 
-  console.log('ACE Markdown Editor ready');
-  console.log(`Loaded ${state.notes.length} notes`);
+  if (DEBUG) {
+    console.log('ACE Markdown Editor ready');
+    console.log(`Loaded ${state.notes.length} notes`);
+  }
 
   bus.emit('editor:ready');
 }

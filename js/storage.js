@@ -230,7 +230,7 @@ export class Storage {
     let used = 0;
     try {
       for (const key in localStorage) {
-        if (localStorage.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
           used += localStorage.getItem(key).length * 2; // UTF-16
         }
       }

@@ -230,8 +230,10 @@ html, body {
     border-right: none;
   }
 
-  .sidebar-overlay {
-    display: none !important;
+  /* Hide sidebar overlay on tablet/desktop */
+  .sidebar-overlay,
+  .sidebar-overlay.visible {
+    display: none;
   }
 
   /* Tablet: sidebar + editor/preview stacked or side-by-side */
@@ -253,13 +255,17 @@ html, body {
     display: none;
   }
 
-  /* Show both panes on tablet - override mobile display:none */
-  .editor-pane {
-    display: flex !important;
+  /* Show both panes on tablet - override mobile data-mode rules */
+  .main-layout .editor-pane,
+  .main-layout[data-mode="edit"] .editor-pane,
+  .main-layout[data-mode="preview"] .editor-pane {
+    display: flex;
   }
 
-  .preview-pane {
-    display: block !important;
+  .main-layout .preview-pane,
+  .main-layout[data-mode="edit"] .preview-pane,
+  .main-layout[data-mode="preview"] .preview-pane {
+    display: block;
   }
 }
 
@@ -277,15 +283,6 @@ html, body {
   .divider {
     display: block;
     width: var(--divider-width);
-  }
-
-  /* Ensure both panes visible on desktop */
-  .editor-pane {
-    display: flex !important;
-  }
-
-  .preview-pane {
-    display: block !important;
   }
 
   /* Dynamic split ratio via CSS custom property */
