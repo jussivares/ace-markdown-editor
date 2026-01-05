@@ -1,7 +1,7 @@
 # KEHITYSLOKI
 
-> **Versio:** 1.0  
-> **Päivitetty:** 2026-01-05  
+> **Versio:** 1.1
+> **Päivitetty:** 2026-01-06
 > **Projekti:** ACE Markdown Editor
 
 <!-- MUOKKAUSOHJE: Tee LISÄYKSIÄ, älä kirjoita uudestaan. -->
@@ -11,10 +11,10 @@
 ## Projektin vaihe
 
 ```
-[████░░░░░░] 40% - Tekninen suunnittelu valmis (v1.2)
+[████████░░] 85% - Core features valmis, testaus ja polish jäljellä
 ```
 
-**Nykyinen fokus:** TECH_SPEC v1.2 valmis (Claude Review tehty), seuraavaksi koodaus (Task-01)
+**Nykyinen fokus:** Task-10 (Keyboard Shortcuts) ja Task-11 (Unit Tests) jäljellä
 
 ---
 
@@ -26,45 +26,131 @@
 |:-----:|-------|---------|:------:|
 | **1** | Määrittely | SPEC_01 - Toiminnallinen määrittely | ✅ |
 | **2** | Tekninen suunnittelu | TECH_SPEC_01 - Tekninen määrittely | ✅ |
-| **3** | Foundation | Perusrakenne, CodeMirror, layout | ▶ |
-| **4** | Core features | Preview, storage, note management | 🔲 |
-| **5** | Polish | Export, theming, edge cases | 🔲 |
+| **3** | Foundation | Perusrakenne, CodeMirror, layout | ✅ |
+| **4** | Core features | Preview, storage, note management | ✅ |
+| **5** | Polish | Export, theming, edge cases | ✅ |
+| **6** | Testing | Unit tests, keyboard shortcuts | ▶ |
 
 ---
 
 ## Seuraava sessio
 
-**Vaihe: 3 - Foundation (Koodaus alkaa)**
+**Vaihe: 6 - Testing & Polish**
 
 ### Tehtävät:
 
 | # | Tehtävä | Arvio | Status |
 |:-:|---------|:-----:|:------:|
-| 1 | Task-01: Projektin perusrakenne | 1h | 🔲 |
-| 2 | Task-02: CSS Variables & Theming | 2h | 🔲 |
-| 3 | Task-06: Storage Module | 2h | 🔲 |
-| 4 | Task-03: Layout Foundation | 4h | 🔲 |
+| 1 | Task-10: Keyboard Shortcuts | 2h | 🔲 |
+| 2 | Task-11: Unit Tests (Vitest) | 3h | ▶ |
+
+---
+
+## Valmiit taskit
+
+| Task | Kuvaus | Commit |
+|:----:|--------|--------|
+| Task-01 | Projektin perusrakenne | `b6dd29a` |
+| Task-02 | CSS Variables & Theming | `b6dd29a` |
+| Task-03 | Responsive Layout | `3011be9` |
+| Task-04 | CodeMirror 6 Editor | `22bed5a` |
+| Task-05 | Markdown Preview (marked + hljs) | `22bed5a` |
+| Task-06 | Storage CRUD | `3011be9` |
+| Task-07 | Note Management UI | `deddb6c` |
+| Task-08 | HTML Export | `deddb6c` |
+| Task-09 | PDF Export | `deddb6c` |
+| - | Warm Notes Dark Theme | `88c6820` |
+| - | Code Review Fixes | `2dde533` |
 
 ---
 
 ## Odottavat tehtävät
 
-### Ennen koodausta
+### Testaus
 
-- [ ] TECH_SPEC_01 valmis ja hyväksytty
-- [ ] Kehitysympäristö pystytetty
-- [ ] Testausstrategia määritelty (manuaalinen vs. automaattinen)
-
-### Myöhemmin
-
+- [ ] Task-11: Vitest unit tests (storage, preview, utils)
 - [ ] iPad-testaus oikealla laitteella
 - [ ] Suorituskykytestaus isoilla dokumenteilla
+
+### Polish
+
+- [ ] Task-10: Keyboard shortcuts
 
 ---
 
 ## Sessiohistoria
 
 <!-- UUSIN SESSIO AINA YLIMMÄKSI -->
+
+### Session #5 (2026-01-06) - Code Review & Fixes
+
+**Tavoite:** Koodin laadunvarmistus ennen testausvaihetta
+
+**Saavutukset:**
+
+- ✅ Kattava code review kaikille tiedostoille
+- ✅ Focus-visible tyylit painikkeille (a11y)
+- ✅ !important poistettu layout.css:stä (korkeampi spesifisyys)
+- ✅ Console.log ehdolliseksi (DEBUG flag)
+- ✅ hasOwnProperty korjattu storage.js:ssä
+
+**Löydökset (korjattu):**
+
+| # | Löydös | Korjaus |
+|---|--------|---------|
+| 1 | Puuttuvat focus-tilat | Lisätty :focus-visible painikkeille |
+| 2 | 4x !important layout.css | Refaktoroitu korkeammalla spesifisyydellä |
+| 3 | Console.log tuotannossa | DEBUG flag localhost-kehitykseen |
+| 4 | hasOwnProperty suoraan | Object.prototype.hasOwnProperty.call() |
+
+**Commitit:** `2dde533`
+
+---
+
+### Session #4 (2026-01-06) - Warm Notes Dark Theme
+
+**Tavoite:** Visuaalinen uudistus "Warm Notes Dark" -teemalla
+
+**Saavutukset:**
+
+- ✅ Täysi väripaletti (cocoa/mocha taustat, coral aksentti, gold otsikot)
+- ✅ Typografia (Nunito UI-fontti Google Fontsista)
+- ✅ CodeMirror teema CSS-muuttujilla
+- ✅ Preview-tyylitys (kultaiset h1, coral linkit, pyöristetyt koodilaatikot)
+- ✅ Komponenttien päivitys (buttonit, notekortit, toastit)
+
+**Teemat:**
+
+| Elementti | Dark | Light |
+|-----------|------|-------|
+| Tausta | #1e1a18 - #332e2c | #f5f2ef - #ffffff |
+| Teksti | #f4ebe4 (cream) | #2b2625 |
+| Aksentti | #f0a8a8 (coral) | #e07070 |
+| Otsikot | #f4d9b0 (gold) | - |
+
+**Commitit:** `88c6820`
+
+---
+
+### Session #3.5 (2026-01-05/06) - Core Implementation
+
+**Tavoite:** Task-01...Task-09 toteutus
+
+**Saavutukset:**
+
+- ✅ Task-01: Projektin perusrakenne (index.html, CSS/JS modulit)
+- ✅ Task-02: CSS Variables & dark/light theming
+- ✅ Task-03: Responsive layout (mobile-first, grid, divider)
+- ✅ Task-04: CodeMirror 6 wrapper (markdown mode, themes)
+- ✅ Task-05: Preview (marked + marked-highlight + DOMPurify)
+- ✅ Task-06: Storage CRUD (localStorage, quota handling)
+- ✅ Task-07: Note Management UI (sidebar, create/delete/select)
+- ✅ Task-08: HTML Export (Blob API)
+- ✅ Task-09: PDF Export (hidden iframe print)
+
+**Commitit:** `b6dd29a`, `3011be9`, `22bed5a`, `deddb6c`
+
+---
 
 ### Session #3 (2026-01-05) - Claude Review ja TECH_SPEC v1.2
 
@@ -159,7 +245,7 @@
 
 | Moduuli | SPEC | TECH_SPEC | CODE | TEST |
 |---------|:----:|:---------:|:----:|:----:|
-| ACE Markdown Editor | ✅ | ✅ | ▶ | 🔲 |
+| ACE Markdown Editor | ✅ | ✅ | ✅ | ▶ |
 
 **Symbolit:** ✅ Valmis | 🔶 Työn alla | 🔲 Ei aloitettu | ▶ Seuraava
 
@@ -169,16 +255,16 @@
 
 | REQ | Kuvaus | Status |
 |-----|--------|:------:|
-| REQ-01 | Split-pane Layout | 🔲 |
-| REQ-02 | Real-time Markdown Preview | 🔲 |
-| REQ-03 | Syntax Highlighting (Editor) | 🔲 |
-| REQ-04 | Syntax Highlighting (Preview) | 🔲 |
-| REQ-05 | Note Management | 🔲 |
-| REQ-06 | Export HTML | 🔲 |
-| REQ-07 | Export PDF | 🔲 |
-| REQ-08 | Preview Security (XSS) | 🔲 |
-| REQ-09 | Dark/Light Theme | 🔲 |
-| REQ-10 | Visual Feedback & Error Handling | 🔲 |
+| REQ-01 | Split-pane Layout | ✅ |
+| REQ-02 | Real-time Markdown Preview | ✅ |
+| REQ-03 | Syntax Highlighting (Editor) | ✅ |
+| REQ-04 | Syntax Highlighting (Preview) | ✅ |
+| REQ-05 | Note Management | ✅ |
+| REQ-06 | Export HTML | ✅ |
+| REQ-07 | Export PDF | ✅ |
+| REQ-08 | Preview Security (XSS) | ✅ |
+| REQ-09 | Dark/Light Theme | ✅ |
+| REQ-10 | Visual Feedback & Error Handling | ✅ |
 
 ---
 
@@ -230,6 +316,7 @@
 
 | Versio | Päivämäärä | Muutokset |
 |--------|------------|-----------|
+| 1.1 | 2026-01-06 | Session #3.5, #4, #5 lisätty, taskit merkitty valmiiksi |
 | 1.0 | 2026-01-05 | Ensimmäinen versio, Session #1 |
 
 ---

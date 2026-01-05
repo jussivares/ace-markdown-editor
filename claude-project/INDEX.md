@@ -1,7 +1,7 @@
 # ACE Markdown Editor - INDEX
 
-> **Päivitetty:** 2026-01-05  
-> **Versio:** 1.0
+> **Päivitetty:** 2026-01-06
+> **Versio:** 1.1
 
 **⚠️ LUE TÄMÄ AINA SESSION ALUSSA!** Tämä dokumentti kertoo mitä prosessiohjeita ja skillejä on käytettävissä.
 
@@ -14,18 +14,34 @@ ace-markdown-editor/
 │
 ├── claude-project/                 ← CLAUDE.AI PROJEKTITIEDOSTOT
 │   ├── INDEX.md                    ← Tämä tiedosto (PAKOLLINEN)
-│   └── KEHITYSLOKI.md              ← Edistymisen seuranta (PAKOLLINEN)
+│   ├── KEHITYSLOKI.md              ← Edistymisen seuranta (PAKOLLINEN)
+│   └── HANDOFF_Session4.md         ← Session handoff -dokumentti
 │
 ├── docs/
-│   ├── SPEC_01_ACE_Markdown_Editor.md  ← Toiminnallinen määrittely ✅
-│   ├── process/                    ← Prosessiohjeet (starter kit)
-│   └── templates/                  ← Dokumenttitemplatet (starter kit)
+│   ├── SPEC_01_ACE_Markdown_Editor.md   ← Toiminnallinen määrittely ✅
+│   ├── TECH_SPEC_01_ACE_Markdown_Editor.md ← Tekninen määrittely ✅
+│   ├── process/                    ← Prosessiohjeet
+│   └── templates/                  ← Dokumenttitemplatet
 │
-├── src/                            ← Sovelluksen lähdekoodi (tulossa)
-│   ├── index.html                  ← Pääsivu
-│   ├── css/                        ← Tyylit
-│   └── js/                         ← JavaScript-moduulit
+├── css/                            ← Tyylit ✅
+│   ├── variables.css               ← Design tokens, theming
+│   ├── layout.css                  ← Grid, responsive, split-pane
+│   ├── components.css              ← Buttons, toasts, sidebar
+│   ├── editor.css                  ← CodeMirror container
+│   ├── preview.css                 ← Rendered markdown
+│   └── print.css                   ← @media print
 │
+├── js/                             ← JavaScript-moduulit ✅
+│   ├── app.js                      ← Orchestrator, event bus
+│   ├── editor.js                   ← CodeMirror 6 wrapper
+│   ├── preview.js                  ← marked + DOMPurify wrapper
+│   ├── storage.js                  ← localStorage CRUD
+│   ├── export.js                   ← HTML & PDF export
+│   ├── ui.js                       ← Layout, theme, toasts
+│   └── utils.js                    ← UUID, debounce
+│
+├── index.html                      ← Pääsivu (entry point) ✅
+├── CLAUDE.md                       ← Claude Code -ohjeet
 ├── .gitignore
 └── README.md
 ```
@@ -41,15 +57,17 @@ ace-markdown-editor/
 
 ---
 
-## 📊 Dokumenttien statukset
+## 📊 Projektin status
 
-| Dokumentti | Status | Sijainti |
-|------------|--------|----------|
-| SPEC_01 (toiminnallinen) | ✅ Valmis | `docs/SPEC_01_ACE_Markdown_Editor.md` |
-| TECH_SPEC_01 (tekninen) | ✅ Valmis v1.2 | `docs/TECH_SPEC_01_ACE_Markdown_Editor.md` |
-| Gemini Review | ✅ Valmis | `docs/REVIEW_Gemini_TECH_SPEC_01.md` |
-| Claude Review | ✅ Integroitu v1.2:een | (TECH_SPEC muutoshistoria) |
-| Koodi | ⏳ Seuraava | `src/` |
+| Osa-alue | Status | Huomiot |
+|----------|--------|---------|
+| SPEC_01 (toiminnallinen) | ✅ Valmis | 10 vaatimusta, 45 AC |
+| TECH_SPEC_01 (tekninen) | ✅ Valmis v1.2 | 11 taskia määritelty |
+| Koodi (Task-01...09) | ✅ Valmis | Core features toteutettu |
+| Warm Notes Dark Theme | ✅ Valmis | Visuaalinen uudistus |
+| Code Review | ✅ Valmis | 4 löydöstä korjattu |
+| Task-10 (Keyboard Shortcuts) | 🔲 Odottaa | - |
+| Task-11 (Unit Tests) | ▶ Seuraava | Vitest |
 
 ---
 
@@ -122,6 +140,7 @@ ace-markdown-editor/
 
 | Versio | Päivämäärä | Muutokset |
 |--------|------------|-----------|
+| 1.1 | 2026-01-06 | Päivitetty projektirakenne, status ajan tasalle |
 | 1.0 | 2026-01-05 | Ensimmäinen versio |
 
 ---
