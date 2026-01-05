@@ -1,4 +1,5 @@
 /* layout.css - Grid, Split-pane, Sidebar, Toolbar */
+/* Theme: Warm Notes Dark - Cozy, soft corners, warm feeling */
 /* Responsive: Mobile-first approach */
 
 * {
@@ -11,10 +12,14 @@ html, body {
   height: 100%;
   font-family: var(--font-sans);
   font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
   color: var(--color-text-primary);
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-bg-deepest);
   /* Prevent pull-to-refresh on mobile */
   overscroll-behavior: none;
+  /* Smooth font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #app {
@@ -32,16 +37,17 @@ html, body {
   min-height: var(--toolbar-height);
   display: flex;
   align-items: center;
-  padding: 0 var(--spacing-md);
-  background-color: var(--color-bg-secondary);
+  padding: 0 var(--space-6);
+  background-color: var(--color-bg-primary);
   border-bottom: 1px solid var(--color-border);
-  gap: var(--spacing-sm);
+  gap: var(--space-2);
 }
 
 .toolbar h1 {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
+  color: var(--color-text-primary);
 }
 
 /* === Main Layout === */
@@ -66,14 +72,14 @@ html, body {
   top: var(--toolbar-height);
   left: 0;
   bottom: 0;
-  width: 280px;
+  width: var(--sidebar-width);
   max-width: 80vw;
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-bg-deep);
   border-right: 1px solid var(--color-border);
   overflow-y: auto;
   z-index: 100;
   transform: translateX(-100%);
-  transition: transform var(--transition-normal);
+  transition: transform var(--transition-smooth);
 }
 
 .sidebar.open {
@@ -107,9 +113,10 @@ html, body {
 
 .preview-pane {
   overflow-y: auto;
-  padding: var(--spacing-md);
-  background-color: var(--color-bg-primary);
+  padding: var(--space-8);
+  background-color: var(--color-bg-elevated);
   display: none; /* Hidden on mobile, shown via tabs */
+  border-radius: var(--radius-3xl) 0 0 var(--radius-3xl);
 }
 
 /* Mobile: Show only one pane at a time */
@@ -133,25 +140,48 @@ html, body {
 
 .divider {
   display: none; /* Hidden on mobile */
-  background-color: var(--color-border);
+  background-color: var(--color-bg-elevated);
   cursor: col-resize;
   transition: background-color var(--transition-fast);
   touch-action: none; /* Prevent scrolling during drag */
   user-select: none;
+  position: relative;
+}
+
+/* Divider pill indicator */
+.divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 48px;
+  background-color: var(--color-border-light);
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
 }
 
 .divider:hover,
 .divider.dragging {
+  background-color: var(--color-bg-hover);
+}
+
+.divider:hover::after,
+.divider.dragging::after {
   background-color: var(--color-accent);
+  height: 64px;
 }
 
 /* === Mobile Tabs === */
 
 .mobile-tabs {
   display: flex;
-  height: 44px;
+  height: 48px;
   border-top: 1px solid var(--color-border);
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-bg-deep);
+  gap: var(--space-1);
+  padding: var(--space-1);
 }
 
 .mobile-tab {
@@ -160,21 +190,22 @@ html, body {
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
-  background: none;
+  background: transparent;
   border: none;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: color var(--transition-fast), background-color var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .mobile-tab.active {
   color: var(--color-accent);
-  background-color: var(--color-bg-primary);
+  background-color: var(--color-accent-subtle);
 }
 
 .mobile-tab:hover {
-  background-color: var(--color-bg-tertiary);
+  background-color: var(--color-bg-hover);
 }
 
 /* === Tablet (≥768px) === */

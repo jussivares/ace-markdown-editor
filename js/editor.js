@@ -11,7 +11,8 @@ import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language'
 import { oneDark } from '@codemirror/theme-one-dark';
 
 /**
- * Light theme using CSS variables
+ * Light theme - Warm Notes Light
+ * Uses CSS variables for theming
  */
 const lightTheme = EditorView.theme({
   '&': {
@@ -22,36 +23,49 @@ const lightTheme = EditorView.theme({
   '.cm-content': {
     fontFamily: 'var(--font-mono)',
     fontSize: 'var(--font-size-base)',
-    padding: 'var(--spacing-md) 0'
+    lineHeight: 'var(--line-height-relaxed)',
+    padding: 'var(--space-4) var(--space-6)',
+    caretColor: 'var(--color-accent)'
   },
   '.cm-gutters': {
-    backgroundColor: 'var(--color-bg-secondary)',
+    backgroundColor: 'var(--color-bg-deep)',
     color: 'var(--color-text-muted)',
     border: 'none',
-    borderRight: '1px solid var(--color-border)'
+    borderRight: '1px solid var(--color-border)',
+    paddingRight: 'var(--space-2)'
+  },
+  '.cm-lineNumbers .cm-gutterElement': {
+    padding: '0 var(--space-2)'
   },
   '.cm-activeLineGutter': {
-    backgroundColor: 'var(--color-bg-tertiary)'
+    backgroundColor: 'var(--color-bg-hover)',
+    color: 'var(--color-text-secondary)'
   },
   '.cm-activeLine': {
-    backgroundColor: 'rgba(0, 0, 0, 0.03)'
+    backgroundColor: 'var(--color-accent-subtle)'
   },
   '.cm-cursor': {
-    borderLeftColor: 'var(--color-accent)'
+    borderLeftColor: 'var(--color-accent)',
+    borderLeftWidth: '2px'
   },
   '.cm-selectionBackground': {
-    backgroundColor: 'rgba(37, 99, 235, 0.2)'
+    backgroundColor: 'rgba(224, 112, 112, 0.15)'
   },
   '&.cm-focused .cm-selectionBackground': {
-    backgroundColor: 'rgba(37, 99, 235, 0.3)'
+    backgroundColor: 'rgba(224, 112, 112, 0.25)'
   },
   '.cm-scroller': {
-    overflow: 'auto'
+    overflow: 'auto',
+    fontFamily: 'var(--font-mono)'
+  },
+  '.cm-line': {
+    padding: '0 var(--space-2)'
   }
 }, { dark: false });
 
 /**
- * Dark theme using CSS variables
+ * Dark theme - Warm Notes Dark
+ * Warm cocoa/mocha tones with coral accent
  */
 const darkTheme = EditorView.theme({
   '&': {
@@ -62,31 +76,43 @@ const darkTheme = EditorView.theme({
   '.cm-content': {
     fontFamily: 'var(--font-mono)',
     fontSize: 'var(--font-size-base)',
-    padding: 'var(--spacing-md) 0'
+    lineHeight: 'var(--line-height-relaxed)',
+    padding: 'var(--space-4) var(--space-6)',
+    caretColor: 'var(--color-accent)'
   },
   '.cm-gutters': {
-    backgroundColor: 'var(--color-bg-secondary)',
+    backgroundColor: 'var(--color-bg-deep)',
     color: 'var(--color-text-muted)',
     border: 'none',
-    borderRight: '1px solid var(--color-border)'
+    borderRight: '1px solid var(--color-border)',
+    paddingRight: 'var(--space-2)'
+  },
+  '.cm-lineNumbers .cm-gutterElement': {
+    padding: '0 var(--space-2)'
   },
   '.cm-activeLineGutter': {
-    backgroundColor: 'var(--color-bg-tertiary)'
+    backgroundColor: 'var(--color-bg-hover)',
+    color: 'var(--color-text-secondary)'
   },
   '.cm-activeLine': {
-    backgroundColor: 'rgba(255, 255, 255, 0.03)'
+    backgroundColor: 'var(--color-accent-subtle)'
   },
   '.cm-cursor': {
-    borderLeftColor: 'var(--color-accent)'
+    borderLeftColor: 'var(--color-accent)',
+    borderLeftWidth: '2px'
   },
   '.cm-selectionBackground': {
-    backgroundColor: 'rgba(59, 130, 246, 0.3)'
+    backgroundColor: 'rgba(240, 168, 168, 0.15)'
   },
   '&.cm-focused .cm-selectionBackground': {
-    backgroundColor: 'rgba(59, 130, 246, 0.4)'
+    backgroundColor: 'rgba(240, 168, 168, 0.25)'
   },
   '.cm-scroller': {
-    overflow: 'auto'
+    overflow: 'auto',
+    fontFamily: 'var(--font-mono)'
+  },
+  '.cm-line': {
+    padding: '0 var(--space-2)'
   }
 }, { dark: true });
 

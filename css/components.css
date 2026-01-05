@@ -1,58 +1,90 @@
-/* components.css - Buttons, Toasts, Dialogs */
-/* Task-07 and Task-10 will expand */
+/* components.css - Buttons, Toasts, Dialogs, Sidebar */
+/* Theme: Warm Notes Dark - Cozy, soft corners, warm feeling */
 
-/* Buttons */
+/* ========================================
+   BUTTONS
+   ======================================== */
+
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding: var(--space-2) var(--space-4);
   font-family: var(--font-sans);
   font-size: var(--font-size-sm);
-  font-weight: 500;
-  border: none;
-  border-radius: 6px;
+  font-weight: var(--font-weight-medium);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: background-color var(--transition-fast);
+  transition: all var(--transition-fast);
+  gap: var(--space-2);
+  white-space: nowrap;
 }
 
 .btn-primary {
   background-color: var(--color-accent);
-  color: white;
+  color: var(--color-accent-text);
+  border-color: transparent;
+  box-shadow: var(--shadow-accent);
 }
 
 .btn-primary:hover {
   background-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
 }
 
 .btn-secondary {
-  background-color: var(--color-bg-tertiary);
+  background-color: var(--color-bg-elevated);
   color: var(--color-text-primary);
+  border-color: var(--color-border);
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-border);
+  background-color: var(--color-bg-hover);
+  border-color: var(--color-border-light);
 }
 
-/* Toast notifications */
+/* ========================================
+   TOAST NOTIFICATIONS
+   ======================================== */
+
 .toast-container {
   position: fixed;
-  bottom: var(--spacing-lg);
-  right: var(--spacing-lg);
+  bottom: var(--space-6);
+  right: var(--space-6);
   z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .toast {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: 6px;
-  margin-top: var(--spacing-sm);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-xl);
   font-size: var(--font-size-sm);
-  box-shadow: var(--shadow-md);
+  font-weight: var(--font-weight-medium);
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.25s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .toast-success {
   background-color: var(--color-success);
-  color: white;
+  color: var(--color-bg-deepest);
 }
 
 .toast-error {
@@ -62,42 +94,50 @@
 
 .toast-info {
   background-color: var(--color-accent);
-  color: white;
+  color: var(--color-accent-text);
 }
 
-/* Confirm dialog */
+/* ========================================
+   CONFIRM DIALOG
+   ======================================== */
+
 .dialog-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1001;
+  backdrop-filter: blur(4px);
 }
 
 .dialog {
-  background-color: var(--color-bg-primary);
-  padding: var(--spacing-lg);
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
+  background-color: var(--color-bg-elevated);
+  padding: var(--space-6);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
   max-width: 400px;
   width: 90%;
+  border: 1px solid var(--color-border);
 }
 
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: var(--spacing-sm);
-  margin-top: var(--spacing-lg);
+  gap: var(--space-2);
+  margin-top: var(--space-6);
 }
 
-/* Theme toggle button */
+/* ========================================
+   THEME TOGGLE BUTTON
+   ======================================== */
+
 .theme-toggle {
-  font-size: 1.25rem;
-  padding: var(--spacing-sm);
-  min-width: 44px;
-  min-height: 44px;
+  font-size: 1.125rem;
+  padding: var(--space-2);
+  min-width: 40px;
+  min-height: 40px;
 }
 
 /* Light mode: show sun, hide moon */
@@ -124,50 +164,71 @@
   }
 }
 
-/* Toolbar spacer */
+/* ========================================
+   TOOLBAR
+   ======================================== */
+
 .toolbar-spacer {
   flex: 1;
 }
 
-/* === Sidebar Components === */
+/* ========================================
+   SIDEBAR COMPONENTS
+   ======================================== */
 
 .sidebar-header {
-  padding: var(--spacing-md);
+  padding: var(--space-5);
   border-bottom: 1px solid var(--color-border);
 }
 
 .new-note-btn {
   width: 100%;
   justify-content: center;
-  gap: var(--spacing-xs);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-xl);
 }
 
 .note-list {
   overflow-y: auto;
   flex: 1;
+  padding: var(--space-3);
 }
+
+/* ========================================
+   NOTE CARD
+   ======================================== */
 
 .note-item {
   display: flex;
-  align-items: center;
-  padding: var(--spacing-sm) var(--spacing-md);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
   cursor: pointer;
-  border-bottom: 1px solid var(--color-border);
-  transition: background-color var(--transition-fast);
-  gap: var(--spacing-sm);
+  border-radius: var(--radius-2xl);
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
 }
 
 .note-item:hover {
-  background-color: var(--color-bg-tertiary);
+  background-color: var(--color-bg-hover);
 }
 
 .note-item.active {
-  background-color: var(--color-accent);
-  color: white;
+  background-color: var(--color-accent-subtle);
+  border-color: rgba(240, 168, 168, 0.3);
+}
+
+/* Remove white text override - use accent color instead */
+.note-item.active .note-title {
+  color: var(--color-text-primary);
 }
 
 .note-item.active .note-date {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--color-text-secondary);
 }
 
 .note-item-content {
@@ -177,30 +238,32 @@
 }
 
 .note-title {
-  font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-1);
 }
 
 .note-date {
-  font-size: 0.75rem;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
-  margin-top: 2px;
 }
 
 .note-delete-btn {
   opacity: 0;
-  padding: var(--spacing-xs);
-  min-width: 32px;
-  min-height: 32px;
+  padding: var(--space-1);
+  min-width: 28px;
+  min-height: 28px;
   background: none;
   border: none;
-  color: var(--color-text-secondary);
+  color: var(--color-text-muted);
   cursor: pointer;
-  border-radius: 4px;
-  transition: opacity var(--transition-fast), background-color var(--transition-fast);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-sm);
 }
 
 .note-item:hover .note-delete-btn {
@@ -213,24 +276,59 @@
 }
 
 .note-item.active .note-delete-btn {
-  color: white;
+  color: var(--color-text-secondary);
 }
 
 .note-item.active .note-delete-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--color-error);
+  color: white;
 }
 
-/* Empty state */
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+
 .note-list-empty {
-  padding: var(--spacing-lg);
+  padding: var(--space-8);
   text-align: center;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
 }
 
-/* Touch devices - always show delete button */
+/* ========================================
+   TOUCH DEVICES
+   ======================================== */
+
 @media (pointer: coarse) {
   .note-delete-btn {
     opacity: 1;
   }
+
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ========================================
+   SAVED BADGE (for toolbar)
+   ======================================== */
+
+.saved-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  background-color: var(--color-bg-elevated);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.saved-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-success);
 }

@@ -1,84 +1,259 @@
-/* variables.css - CSS Custom Properties */
-/* Theming: .light (explicit light), .dark (explicit dark), default (system) */
+/* ==========================================================================
+   ACE Markdown Editor - Design Tokens (Warm Notes Dark Theme)
+   Extracted from UI Mockup 2026-01-05
+   ========================================================================== */
 
 :root {
-  /* Colors - Light theme (default) */
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f5f5f5;
-  --color-bg-tertiary: #e5e5e5;
-  --color-text-primary: #1a1a1a;
-  --color-text-secondary: #666666;
-  --color-text-muted: #999999;
-  --color-border: #e0e0e0;
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-success: #16a34a;
-  --color-error: #dc2626;
-  --color-warning: #d97706;
+  /* ========================================
+     COLOR PALETTE - Warm Notes Dark
+     ======================================== */
 
-  /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', Consolas, monospace;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
+  /* Backgrounds - warm cocoa/mocha tones */
+  --color-bg-deepest: #1e1a18;    /* Outermost edges, body */
+  --color-bg-deep: #252120;       /* Sidebar */
+  --color-bg-primary: #2b2625;    /* Main content area */
+  --color-bg-secondary: #252120;  /* Alias for compatibility */
+  --color-bg-tertiary: #3d3530;   /* Alias for hover */
+  --color-bg-elevated: #332e2c;   /* Cards, preview pane, elevated surfaces */
+  --color-bg-hover: #3d3530;      /* Hover states, active states */
 
-  /* Spacing */
-  --spacing-xs: 0.25rem;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
+  /* Text - creamy warm tones (NO pure white!) */
+  --color-text-primary: #f4ebe4;    /* Main text (warm cream) */
+  --color-text-secondary: #b8a99e;  /* Secondary text, labels */
+  --color-text-muted: #7a6e66;      /* Muted text, placeholders, dates */
 
-  /* Layout */
-  --sidebar-width: 280px;
+  /* Accent - soft coral/rose */
+  --color-accent: #f0a8a8;                      /* Primary accent */
+  --color-accent-hover: #f4bfbf;                /* Lighter on hover */
+  --color-accent-muted: #d4908f;                /* Muted version */
+  --color-accent-subtle: rgba(240, 168, 168, 0.12);  /* Very subtle bg */
+  --color-accent-glow: rgba(240, 168, 168, 0.25);    /* Box shadows */
+  --color-accent-text: #1e1a18;                 /* Text on accent bg */
+
+  /* Secondary accent - warm gold (for highlights, bold text) */
+  --color-gold: #f4d9b0;
+
+  /* Borders */
+  --color-border: #3d3530;
+  --color-border-light: #4a433e;
+
+  /* Status colors */
+  --color-success: #5cd85c;
+  --color-warning: #feca57;
+  --color-error: #ff6b6b;
+
+  /* ========================================
+     SYNTAX HIGHLIGHTING
+     ======================================== */
+
+  --syntax-keyword: #82aaff;     /* const, let, function */
+  --syntax-string: #c3e88d;      /* "strings" */
+  --syntax-function: #c792ea;    /* function names */
+  --syntax-variable: #f0a8a8;    /* variables (matches accent) */
+  --syntax-comment: #7a6e66;     /* // comments */
+  --syntax-operator: #89ddff;    /* = + - * / */
+  --syntax-number: #f78c6c;      /* numbers */
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+
+  /* Font families */
+  --font-sans: "Nunito", "SF Pro Rounded", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono", Consolas, "Liberation Mono", monospace;
+
+  /* Font sizes */
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 32px;
+
+  /* Font weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line heights */
+  --line-height-tight: 1.4;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.8;
+
+  /* ========================================
+     SPACING
+     ======================================== */
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ========================================
+     BORDER RADIUS (Warm Notes = rounded)
+     ======================================== */
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+  --radius-3xl: 16px;
+  --radius-full: 9999px;
+
+  /* ========================================
+     SHADOWS
+     ======================================== */
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --shadow-accent: 0 4px 12px var(--color-accent-glow);
+
+  /* ========================================
+     TRANSITIONS
+     ======================================== */
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ========================================
+     LAYOUT
+     ======================================== */
+
+  --sidebar-width: 260px;
   --toolbar-height: 56px;
-  --divider-width: 8px;
+  --divider-width: 12px;
+  --content-max-width: 680px;
+}
 
-  /* Shadows */
+/* ========================================
+   LIGHT THEME OVERRIDE
+   ======================================== */
+
+.light {
+  /* Backgrounds - warm cream tones */
+  --color-bg-deepest: #f5f2ef;
+  --color-bg-deep: #ebe7e3;
+  --color-bg-primary: #faf8f6;
+  --color-bg-secondary: #ebe7e3;
+  --color-bg-tertiary: #f0ece8;
+  --color-bg-elevated: #ffffff;
+  --color-bg-hover: #f0ece8;
+
+  /* Text - warm dark tones */
+  --color-text-primary: #2b2625;
+  --color-text-secondary: #6b5f57;
+  --color-text-muted: #9a8d84;
+
+  /* Accent - deeper coral for contrast */
+  --color-accent: #e07070;
+  --color-accent-hover: #d45a5a;
+  --color-accent-muted: #c48080;
+  --color-accent-subtle: rgba(224, 112, 112, 0.1);
+  --color-accent-glow: rgba(224, 112, 112, 0.2);
+  --color-accent-text: #ffffff;
+
+  /* Borders */
+  --color-border: #e5e0db;
+  --color-border-light: #d4cdc6;
+
+  /* Shadows - lighter */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
 
-  /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
+  /* Syntax - adjust for light bg */
+  --syntax-keyword: #d73a49;
+  --syntax-string: #22863a;
+  --syntax-function: #6f42c1;
+  --syntax-variable: #e07070;
+  --syntax-comment: #9a8d84;
+  --syntax-number: #005cc5;
+  --syntax-operator: #0366d6;
 }
 
-/* Dark theme - explicit .dark class */
-.dark {
-  --color-bg-primary: #1a1a1a;
-  --color-bg-secondary: #262626;
-  --color-bg-tertiary: #333333;
-  --color-text-primary: #e5e5e5;
-  --color-text-secondary: #a3a3a3;
-  --color-text-muted: #737373;
-  --color-border: #404040;
-  --color-accent: #3b82f6;
-  --color-accent-hover: #60a5fa;
-  --color-success: #22c55e;
-  --color-error: #ef4444;
-  --color-warning: #f59e0b;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-}
-
-/* System preference: dark mode (when no explicit .light or .dark) */
-@media (prefers-color-scheme: dark) {
+/* System preference: light mode override */
+@media (prefers-color-scheme: light) {
   :root:not(.light):not(.dark) {
-    --color-bg-primary: #1a1a1a;
-    --color-bg-secondary: #262626;
-    --color-bg-tertiary: #333333;
-    --color-text-primary: #e5e5e5;
-    --color-text-secondary: #a3a3a3;
-    --color-text-muted: #737373;
-    --color-border: #404040;
-    --color-accent: #3b82f6;
-    --color-accent-hover: #60a5fa;
-    --color-success: #22c55e;
-    --color-error: #ef4444;
-    --color-warning: #f59e0b;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    /* Backgrounds - warm cream tones */
+    --color-bg-deepest: #f5f2ef;
+    --color-bg-deep: #ebe7e3;
+    --color-bg-primary: #faf8f6;
+    --color-bg-secondary: #ebe7e3;
+    --color-bg-tertiary: #f0ece8;
+    --color-bg-elevated: #ffffff;
+    --color-bg-hover: #f0ece8;
+
+    /* Text - warm dark tones */
+    --color-text-primary: #2b2625;
+    --color-text-secondary: #6b5f57;
+    --color-text-muted: #9a8d84;
+
+    /* Accent - deeper coral for contrast */
+    --color-accent: #e07070;
+    --color-accent-hover: #d45a5a;
+    --color-accent-muted: #c48080;
+    --color-accent-subtle: rgba(224, 112, 112, 0.1);
+    --color-accent-glow: rgba(224, 112, 112, 0.2);
+    --color-accent-text: #ffffff;
+
+    /* Borders */
+    --color-border: #e5e0db;
+    --color-border-light: #d4cdc6;
+
+    /* Shadows - lighter */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+    /* Syntax - adjust for light bg */
+    --syntax-keyword: #d73a49;
+    --syntax-string: #22863a;
+    --syntax-function: #6f42c1;
+    --syntax-variable: #e07070;
+    --syntax-comment: #9a8d84;
+    --syntax-number: #005cc5;
+    --syntax-operator: #0366d6;
   }
+}
+
+/* Explicit dark class */
+.dark {
+  --color-bg-deepest: #1e1a18;
+  --color-bg-deep: #252120;
+  --color-bg-primary: #2b2625;
+  --color-bg-secondary: #252120;
+  --color-bg-tertiary: #3d3530;
+  --color-bg-elevated: #332e2c;
+  --color-bg-hover: #3d3530;
+  --color-text-primary: #f4ebe4;
+  --color-text-secondary: #b8a99e;
+  --color-text-muted: #7a6e66;
+  --color-accent: #f0a8a8;
+  --color-accent-hover: #f4bfbf;
+  --color-accent-muted: #d4908f;
+  --color-accent-subtle: rgba(240, 168, 168, 0.12);
+  --color-accent-glow: rgba(240, 168, 168, 0.25);
+  --color-accent-text: #1e1a18;
+  --color-border: #3d3530;
+  --color-border-light: #4a433e;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
