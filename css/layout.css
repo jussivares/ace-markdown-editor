@@ -116,8 +116,6 @@ html, body {
   padding: var(--space-8);
   background-color: var(--color-bg-elevated);
   display: none; /* Hidden on mobile, shown via tabs */
-  /* Floating island effect */
-  border-radius: var(--radius-3xl);
 }
 
 /* Mobile: Show only one pane at a time */
@@ -141,9 +139,8 @@ html, body {
 
 .divider {
   display: none; /* Hidden on mobile */
-  background-color: var(--color-bg-elevated);
+  background-color: transparent;
   cursor: col-resize;
-  transition: background-color var(--transition-fast);
   touch-action: none; /* Prevent scrolling during drag */
   user-select: none;
   position: relative;
@@ -165,7 +162,7 @@ html, body {
 
 .divider:hover,
 .divider.dragging {
-  background-color: var(--color-bg-hover);
+  background-color: transparent;
 }
 
 .divider:hover::after,
@@ -269,14 +266,6 @@ html, body {
     display: block;
   }
 
-  /* Tablet floating preview */
-  .preview-pane {
-    margin: var(--space-3);
-    margin-left: 0;
-    box-shadow:
-      0 4px 6px rgba(0, 0, 0, 0.07),
-      0 10px 24px rgba(0, 0, 0, 0.15);
-  }
 }
 
 /* === Desktop (≥1024px) - Split Pane === */
@@ -312,14 +301,6 @@ html, body {
       calc((100% - var(--divider-width)) * (1 - var(--split-ratio)));
   }
 
-  /* Desktop - more pronounced floating effect */
-  .preview-pane {
-    margin: var(--space-4);
-    margin-left: 0;
-    box-shadow:
-      0 4px 6px rgba(0, 0, 0, 0.07),
-      0 12px 28px rgba(0, 0, 0, 0.18);
-  }
 }
 
 /* === Sidebar Toggle Button === */
