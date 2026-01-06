@@ -318,6 +318,51 @@ html, body {
   }
 }
 
+/* === Scrollbars === */
+
+/* Editor pane scrollbar - matches editor background */
+.editor-pane ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.editor-pane ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.editor-pane ::-webkit-scrollbar-thumb {
+  background-color: var(--color-bg-hover);
+  border-radius: var(--radius-full);
+}
+
+.editor-pane ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-border-light);
+}
+
+/* Preview pane scrollbar - matches preview background */
+.preview-pane::-webkit-scrollbar {
+  width: 8px;
+}
+
+.preview-pane::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.preview-pane::-webkit-scrollbar-thumb {
+  background-color: var(--color-bg-hover);
+  border-radius: var(--radius-full);
+}
+
+.preview-pane::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-border-light);
+}
+
+/* Firefox scrollbar styling */
+.editor-pane,
+.preview-pane {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-bg-hover) transparent;
+}
+
 /* === Utility classes === */
 
 .visually-hidden {
