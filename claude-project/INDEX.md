@@ -15,6 +15,7 @@ ace-markdown-editor/
 ├── claude-project/                 ← CLAUDE.AI PROJEKTITIEDOSTOT
 │   ├── INDEX.md                    ← Tämä tiedosto (PAKOLLINEN)
 │   ├── KEHITYSLOKI.md              ← Edistymisen seuranta (PAKOLLINEN)
+│   ├── ROADMAP_V2_Cloud_Migration.md ← V2 suunnitelma (pilvi + auth)
 │   └── HANDOFF_Session4.md         ← Session handoff -dokumentti
 │
 ├── docs/
@@ -68,6 +69,7 @@ ace-markdown-editor/
 | Code Review | ✅ Valmis | 4 löydöstä korjattu |
 | Task-10 (Keyboard Shortcuts) | 🔲 Odottaa | - |
 | Task-11 (Unit Tests) | ▶ Seuraava | Vitest |
+| V2 Roadmap (Cloud + Auth) | 📋 Suunniteltu | Supabase suositus |
 
 ---
 
@@ -129,10 +131,12 @@ ace-markdown-editor/
 | Resurssi | URL |
 |----------|-----|
 | GitHub repo | https://github.com/jussivares/ace-markdown-editor |
+| **V2 Roadmap** | `claude-project/ROADMAP_V2_Cloud_Migration.md` |
 | CodeMirror 6 docs | https://codemirror.net/docs/ |
 | marked.js | https://marked.js.org/ |
 | highlight.js | https://highlightjs.org/ |
 | DOMPurify | https://github.com/cure53/DOMPurify |
+| Supabase (V2) | https://supabase.com/docs |
 
 ---
 
