@@ -1,6 +1,6 @@
 # ACE Markdown Editor - V2 Roadmap: Cloud Migration
 
-> **Versio:** 1.0  
+> **Versio:** 1.1  
 > **Päivitetty:** 2026-01-06  
 > **Status:** Reviewed & Approved  
 > **Tyyppi:** Arkkitehtuurisuunnitelma  
@@ -14,6 +14,7 @@
 |--------|-------|-----------|
 | 0.1 | 2026-01-06 | Initial draft (Claude Code) |
 | 1.0 | 2026-01-06 | Session #4 review: UI polish, Vercel deploy, V1.5 features |
+| 1.1 | 2026-01-06 | Restored missing sections: AWS arch, code examples, tech debt |
 
 ---
 
@@ -193,21 +194,122 @@ ACE Markdown Editor on **client-side-only** sovellus, nyt julkaistu Verceliin:
 | Free | $0/kk | 500MB DB, 1GB storage, 50K MAU | MVP, kehitys |
 | Pro | $25/kk | 8GB DB, 100GB storage, rajaton MAU | 100-10K users |
 
+**Supabase-integraatio (esimerkki):**
+
+```javascript
+// cloud-storage.js - V2 Supabase client
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
+
+export class CloudStorage {
+  async saveNote(note) {
+    const { data, error } = await supabase
+      .from('notes')
+      .upsert({
+        id: note.id,
+        user_id: supabase.auth.getUser().id,
+        title: note.title,
+        content: note.content,
+        emoji: note.emoji,
+        updated_at: new Date().toISOString()
+      });
+    if (error) throw error;
+    return data;
+  }
+
+  async getAllNotes() {
+    const { data, error } = await supabase
+      .from('notes')
+      .select('*')
+      .is('deleted_at', null)
+      .order('updated_at', { ascending: false });
+    if (error) throw error;
+    return data;
+  }
+
+  async deleteNote(id) {
+    // Soft delete
+    const { error } = await supabase
+      .from('notes')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) throw error;
+  }
+}
+```
+
 ### 3.2 Vaihtoehto B: AWS Native Stack
 
 **Milloin AWS?**
-- >10K aktiivista käyttäjää
-- Enterprise-vaatimukset (SLA, compliance)
-- Olemassa oleva AWS-infra
-- Täysi kontrolli kustannuksista
+- Tarvitaan täysi kontrolli infrasta
+- Suuri skaalautuvuustarve (>10K käyttäjää)
+- Olemassa oleva AWS-osaaminen/tili
+- Enterprise-tason vaatimukset
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                          Browser                             │
+│  ┌─────────────────────────────────────────────────────────┐│
+│  │                    ACE Editor (JS)                      ││
+│  │  ┌──────────┐  ┌─────────────┐  ┌────────────────────┐ ││
+│  │  │CodeMirror│  │  AWS SDK    │  │  localStorage      │ ││
+│  │  │  marked  │  │  Amplify    │  │  (offline cache)   │ ││
+│  │  └──────────┘  └──────┬──────┘  └────────────────────┘ ││
+│  └───────────────────────┼─────────────────────────────────┘│
+└──────────────────────────┼──────────────────────────────────┘
+                           │ HTTPS
+                           ▼
+┌──────────────────────────────────────────────────────────────┐
+│                         AWS Cloud                             │
+│                                                               │
+│  ┌──────────────┐      ┌──────────────────────────────────┐  │
+│  │   Cognito    │      │          API Gateway             │  │
+│  │   (Auth)     │      │                                  │  │
+│  └──────────────┘      └──────────────┬───────────────────┘  │
+│                                       │                       │
+│                                       ▼                       │
+│                        ┌──────────────────────────────────┐  │
+│                        │       Lambda Functions           │  │
+│                        │  ┌────────┐ ┌────────┐          │  │
+│                        │  │ GET    │ │ POST   │          │  │
+│                        │  │ /notes │ │ /notes │          │  │
+│                        │  └────────┘ └────────┘          │  │
+│                        └──────────────┬───────────────────┘  │
+│                                       │                       │
+│              ┌────────────────────────┴───────────────────┐  │
+│              ▼                                            ▼  │
+│  ┌──────────────────────┐              ┌─────────────────┐  │
+│  │   RDS PostgreSQL     │      tai     │    DynamoDB     │  │
+│  │   (relaatiotiedot)   │              │   (serverless)  │  │
+│  └──────────────────────┘              └─────────────────┘  │
+└──────────────────────────────────────────────────────────────┘
+```
+
+**AWS-komponentit:**
 
 | Palvelu | Käyttötarkoitus | Kustannus (arvio) |
 |---------|-----------------|-------------------|
 | Cognito | Käyttäjähallinta | Ilmainen <50K MAU |
-| API Gateway | REST API | ~$3.50/M requests |
+| API Gateway | REST API endpoint | ~$3.50/M requests |
 | Lambda | Backend-logiikka | ~$0.20/M requests |
-| DynamoDB | Tietokanta | ~$1-5/kk (pieni) |
-| S3 | Liitetiedostot | ~$0.023/GB |
+| RDS (PostgreSQL) | Tietokanta | ~$15/kk (t3.micro) |
+| DynamoDB | Vaihtoehto RDS:lle | ~$1/kk (pieni käyttö) |
+| S3 | Liitetiedostot (V3) | ~$0.023/GB |
+
+**PostgreSQL vs DynamoDB:**
+
+| Ominaisuus | PostgreSQL | DynamoDB |
+|------------|------------|----------|
+| Kyselyt | Monipuoliset (SQL) | Rajoitetut (key-based) |
+| Skaalautuvuus | Manuaalinen | Automaattinen |
+| Kustannus | Kiinteä baseline | Pay-per-use |
+| Relaatiot | Täysi tuki | Ei natiivitukea |
+| Full-text search | Sisäänrakennettu | Ei (tarvitsee OpenSearch) |
+| **Suositus** | V2-V3 | V4+ (suuri skaalaus) |
 
 ### 3.3 Suositus
 
@@ -232,6 +334,9 @@ ACE Markdown Editor on **client-side-only** sovellus, nyt julkaistu Verceliin:
 ### 4.1 PostgreSQL Schema (V2)
 
 ```sql
+-- Users (Supabase Auth hoitaa, mutta viittaus)
+-- auth.users (id, email, created_at, ...)
+
 -- Notes table
 CREATE TABLE notes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -241,46 +346,65 @@ CREATE TABLE notes (
   emoji VARCHAR(10) DEFAULT '📝',  -- User-selected or random
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  deleted_at TIMESTAMPTZ NULL  -- Soft delete
+  deleted_at TIMESTAMPTZ NULL,  -- Soft delete
+
+  -- Indeksit
+  CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
 
 -- Row Level Security
 ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users see own notes" ON notes FOR SELECT
+-- Käyttäjä näkee vain omat notensa
+CREATE POLICY "Users can only see own notes"
+  ON notes FOR SELECT
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users insert own notes" ON notes FOR INSERT
+CREATE POLICY "Users can only insert own notes"
+  ON notes FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users update own notes" ON notes FOR UPDATE
+CREATE POLICY "Users can only update own notes"
+  ON notes FOR UPDATE
   USING (auth.uid() = user_id);
 
-CREATE POLICY "Users delete own notes" ON notes FOR DELETE
+CREATE POLICY "Users can only delete own notes"
+  ON notes FOR DELETE
   USING (auth.uid() = user_id);
 
--- Performance indexes
-CREATE INDEX idx_notes_user_updated ON notes(user_id, updated_at DESC);
+-- Indeksit suorituskykyyn
+CREATE INDEX idx_notes_user_id ON notes(user_id);
+CREATE INDEX idx_notes_updated_at ON notes(user_id, updated_at DESC);
 
--- Auto-update timestamp
+-- Updated_at trigger
+CREATE OR REPLACE FUNCTION update_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TRIGGER notes_updated_at
   BEFORE UPDATE ON notes
   FOR EACH ROW
-  EXECUTE FUNCTION moddatetime(updated_at);
+  EXECUTE FUNCTION update_updated_at();
 ```
 
-### 4.2 V3+ Laajennukset
+### 4.2 V3+ Laajennukset (tulevaisuus)
 
 ```sql
--- Folders (V3)
+-- Folders/Tags (V3)
 CREATE TABLE folders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id),
   name VARCHAR(50) NOT NULL,
   parent_id UUID REFERENCES folders(id),
-  color VARCHAR(7) DEFAULT '#f0a8a8'
+  color VARCHAR(7) DEFAULT '#f0a8a8',
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Note-Folder relation
 ALTER TABLE notes ADD COLUMN folder_id UUID REFERENCES folders(id);
 
 -- Tags (V3)
@@ -301,7 +425,8 @@ CREATE TABLE note_tags (
 CREATE TABLE note_shares (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   note_id UUID NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
-  shared_with_email VARCHAR(255),
+  shared_with_user_id UUID REFERENCES auth.users(id),
+  shared_with_email VARCHAR(255),  -- Voi jakaa ennen rekisteröitymistä
   permission VARCHAR(10) CHECK (permission IN ('read', 'write')),
   share_token VARCHAR(64) UNIQUE,  -- Public link
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -312,16 +437,56 @@ CREATE TABLE note_shares (
 
 ## 5. Authentication Flow
 
-### 5.1 Tuetut menetelmät
+### 5.1 Tuetut kirjautumismenetelmät (V2)
 
-| Menetelmä | Prioriteetti | UX |
-|-----------|:------------:|-----|
-| Magic Link | P0 | Paras UX - ei salasanaa muistettavaksi |
-| Email + Password | P1 | Perinteinen vaihtoehto |
+| Menetelmä | Prioriteetti | Kuvaus |
+|-----------|:------------:|--------|
+| Magic Link | P0 | Paras UX - salasanaton email-linkki |
+| Email + Password | P1 | Perinteinen rekisteröinti |
 | Google OAuth | P2 | "Kirjaudu Googlella" |
-| Apple OAuth | P2 | iOS-käyttäjille |
+| Apple OAuth | P2 | "Kirjaudu Applella" (iOS-tuki) |
 
-### 5.2 Login UI (Warm Notes -tyyli)
+### 5.2 Auth State Flow
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      App Initialization                      │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+                   ┌───────────────┐
+                   │ Check Session │
+                   │  (Supabase)   │
+                   └───────┬───────┘
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+              ▼                         ▼
+    ┌─────────────────┐      ┌─────────────────┐
+    │   Logged Out    │      │   Logged In     │
+    │                 │      │                 │
+    │  Show Login     │      │  Load Notes     │
+    │  Screen         │      │  from Cloud     │
+    └────────┬────────┘      └────────┬────────┘
+             │                        │
+             ▼                        ▼
+    ┌─────────────────┐      ┌─────────────────┐
+    │ Login/Register  │      │ Sync with       │
+    │                 │      │ localStorage    │
+    │ - Email/Pass    │      │ (offline cache) │
+    │ - Magic Link    │      │                 │
+    │ - OAuth         │      │                 │
+    └────────┬────────┘      └─────────────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │  On Success:    │
+    │  Migrate local  │
+    │  notes to cloud │
+    └─────────────────┘
+```
+
+### 5.3 Login UI (Warm Notes -tyyli)
 
 ```
 ┌────────────────────────────────────────────────────────────┐
@@ -347,6 +512,7 @@ CREATE TABLE note_shares (
 │  │  └────────────────┘  └────────────────┘             │ │
 │  │                                                       │ │
 │  │           Use password instead →                      │ │
+│  │           Forgot password?                            │ │
 │  └──────────────────────────────────────────────────────┘ │
 │                                                            │
 │          📝 Continue without account (local only)         │
@@ -354,41 +520,116 @@ CREATE TABLE note_shares (
 └────────────────────────────────────────────────────────────┘
 ```
 
-### 5.3 Migraatio localStorage → Cloud
+---
+
+## 6. Migraatiostrategia (localStorage → Cloud)
+
+### 6.1 Ongelma
+
+Olemassa olevilla käyttäjillä on dataa localStoragessa. Miten siirretään pilveen?
+
+### 6.2 Ratkaisu: Hybrid Storage + Migration Prompt
 
 ```javascript
-async function handleFirstLogin(user) {
-  const localNotes = localStorage.getItem('ace_notes');
-  
-  if (localNotes) {
-    const notes = JSON.parse(localNotes);
-    const count = notes.length;
-    
-    const migrate = await showDialog({
-      title: `Found ${count} local notes`,
+// storage.js - V2 Hybrid approach
+
+export class HybridStorage {
+  constructor(cloudStorage, localStorage) {
+    this.cloud = cloudStorage;
+    this.local = localStorage;
+  }
+
+  async initialize() {
+    const user = await this.cloud.getCurrentUser();
+
+    if (user) {
+      // Kirjautunut - käytä pilveä
+      const localNotes = this.local.getAllNotes();
+
+      if (localNotes.length > 0) {
+        // Tarjoa migraatiota
+        await this.offerMigration(localNotes);
+      }
+
+      return this.cloud.getAllNotes();
+    } else {
+      // Ei kirjautunut - käytä localStoragea (V1 mode)
+      return this.local.getAllNotes();
+    }
+  }
+
+  async offerMigration(localNotes) {
+    const confirmed = await showDialog({
+      title: `Found ${localNotes.length} local notes`,
       message: 'Upload them to your cloud account?',
       buttons: ['Upload', 'Keep Local', 'Discard']
     });
-    
-    if (migrate === 'Upload') {
-      for (const note of notes) {
-        await supabase.from('notes').insert({
-          ...note,
-          user_id: user.id
-        });
+
+    if (confirmed === 'Upload') {
+      for (const note of localNotes) {
+        await this.cloud.saveNote(note);
       }
-      localStorage.removeItem('ace_notes');
-      showToast(`✅ Migrated ${count} notes to cloud`);
+      // Tyhjennä localStorage onnistuneen migraation jälkeen
+      this.local.clear();
+      showToast(`✅ Migrated ${localNotes.length} notes to cloud`);
+    }
+  }
+
+  async saveNote(note) {
+    const user = await this.cloud.getCurrentUser();
+
+    if (user) {
+      // Tallenna pilveen + local cache
+      const saved = await this.cloud.saveNote(note);
+      this.local.cacheNote(saved);  // Offline-tuki
+      return saved;
+    } else {
+      return this.local.saveNote(note);
     }
   }
 }
 ```
 
+### 6.3 Offline-first Strategy (V2.1)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Save Note Flow                            │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+                   ┌───────────────┐
+                   │ Save to Local │ ← Aina ensin (nopea)
+                   │   Storage     │
+                   └───────┬───────┘
+                           │
+                           ▼
+                   ┌───────────────┐
+                   │ Online?       │
+                   └───────┬───────┘
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+              ▼                         ▼
+    ┌─────────────────┐      ┌─────────────────┐
+    │   YES: Sync     │      │   NO: Queue     │
+    │   to Cloud      │      │   for Later     │
+    │   immediately   │      │                 │
+    └─────────────────┘      └────────┬────────┘
+                                      │
+                                      ▼
+                             ┌─────────────────┐
+                             │ When Online:    │
+                             │ Process Queue   │
+                             │ (background)    │
+                             └─────────────────┘
+```
+
 ---
 
-## 6. Deployment Architecture
+## 7. Deployment Architecture
 
-### 6.1 Nykyinen (V1) ✅
+### 7.1 Nykyinen (V1) ✅
 
 ```
 GitHub (jussivares/ace-markdown-editor)
@@ -402,7 +643,7 @@ Vercel (auto-deploy)
 🌐 ace-markdown-editor.vercel.app
 ```
 
-### 6.2 V2 Cloud Edition
+### 7.2 V2 Cloud Edition
 
 ```
 GitHub
@@ -423,20 +664,11 @@ GitHub
               └── Realtime (sync)
 ```
 
-### 6.3 Environment Variables (Vercel)
-
-```env
-# Supabase
-VITE_SUPABASE_URL=https://xxx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJ...
-
-# Analytics (optional)
-VITE_PLAUSIBLE_DOMAIN=ace-editor.app
-```
-
 ---
 
-## 7. Roadmap Timeline
+## 8. V2 Roadmap
+
+### 8.1 Vaiheet
 
 ```
  V1.0           V1.5           V2.0 MVP        V2.1           V3.0
@@ -451,69 +683,117 @@ VITE_PLAUSIBLE_DOMAIN=ace-editor.app
    DONE        2 weeks        4 weeks         2 weeks        6 weeks
 ```
 
-### 7.1 Task Breakdown
+### 8.2 Task Breakdown
 
-#### V1.5 - UI/UX Polish (2 viikkoa)
+#### Phase 1: V1.5 - UI/UX Polish (2 viikkoa)
 
-| # | Task | Arvio | Riippuvuudet |
-|:-:|------|:-----:|:------------:|
-| UI-01 | Search bar | 3h | - |
-| UI-02 | Keyboard shortcuts | 2h | - |
-| UI-03 | macOS code block dots | 1h | - |
-| UI-04 | PWA manifest + icons | 2h | - |
-| UI-05 | Word/char count | 1h | - |
-| UI-06 | Unit tests (Vitest) | 4h | - |
+| Task | Kuvaus | Arvio | Status |
+|:----:|--------|:-----:|:------:|
+| UI-01 | Search bar | 3h | 🔲 |
+| UI-02 | Keyboard Shortcuts (Ctrl+S, Ctrl+N, etc.) | 2h | 🔲 |
+| UI-03 | macOS code block dots | 1h | 🔲 |
+| UI-04 | PWA manifest + icons | 2h | 🔲 |
+| UI-05 | Word/char count | 1h | 🔲 |
+| UI-06 | Unit Tests (Vitest) - storage, preview, utils | 4h | 🔲 |
+| UI-07 | iPad-testaus oikealla laitteella | 2h | 🔲 |
 
-#### V2.0 - Cloud MVP (4 viikkoa)
+#### Phase 2: V2.0 - Cloud MVP (4 viikkoa)
 
-| # | Task | Arvio | Riippuvuudet |
-|:-:|------|:-----:|:------------:|
-| CL-01 | Supabase project setup | 1h | - |
-| CL-02 | Database schema + RLS | 2h | CL-01 |
-| CL-03 | CloudStorage module | 4h | CL-02 |
-| CL-04 | Auth UI (Login/Register) | 6h | CL-01 |
-| CL-05 | Session management | 2h | CL-04 |
-| CL-06 | Migration flow | 3h | CL-03, CL-04 |
-| CL-07 | User settings UI | 2h | CL-04 |
-| CL-08 | Error handling | 3h | CL-03 |
+| Task | Kuvaus | Arvio | Riippuvuudet |
+|:----:|--------|:-----:|:------------:|
+| CL-01 | Supabase-projektin setup | 1h | - |
+| CL-02 | Tietokantaskeema (notes table + RLS) | 2h | CL-01 |
+| CL-03 | CloudStorage-moduuli (storage.js refaktorointi) | 4h | CL-02 |
+| CL-04 | Auth UI (Login/Register/Logout) | 6h | CL-01 |
+| CL-05 | Session management (auto-refresh tokens) | 2h | CL-04 |
+| CL-06 | Migration flow (localStorage → cloud) | 3h | CL-03, CL-04 |
+| CL-07 | User settings (avatar, name) | 2h | CL-04 |
+| CL-08 | Error handling (network errors, auth errors) | 3h | CL-03 |
 
-#### V2.1 - Reliability (2 viikkoa)
+#### Phase 3: V2.1 - Reliability (2 viikkoa)
 
-| # | Task | Arvio |
-|:-:|------|:-----:|
-| RE-01 | Offline queue | 4h |
-| RE-02 | Conflict resolution | 6h |
-| RE-03 | Realtime sync | 4h |
-| RE-04 | Service Worker (PWA) | 4h |
+| Task | Kuvaus | Arvio |
+|:----:|--------|:-----:|
+| RE-01 | Offline queue (save when back online) | 4h |
+| RE-02 | Conflict resolution (last-write-wins / merge) | 6h |
+| RE-03 | Realtime sync (Supabase subscriptions) | 4h |
+| RE-04 | Service Worker (PWA offline support) | 4h |
 
-#### V3.0 - Features (6 viikkoa)
+#### Phase 4: V3.0 - Features (6 viikkoa)
 
-| # | Task | Arvio |
-|:-:|------|:-----:|
+| Task | Kuvaus | Arvio |
+|:----:|--------|:-----:|
 | FE-01 | Folders/Collections | 8h |
 | FE-02 | Tags | 6h |
-| FE-03 | Full-text search (cloud) | 4h |
+| FE-03 | Search (full-text) | 4h |
 | FE-04 | Note sharing (read-only links) | 6h |
 | FE-05 | Export to Markdown file | 2h |
 | FE-06 | Import from Markdown | 3h |
+| FE-07 | Collaborative editing (V4 prep) | TBD |
 
 ---
 
-## 8. Riskit ja mitigaatio
+## 9. Kustannusarvio
+
+### 9.1 Supabase (Suositus V2)
+
+| Käyttäjämäärä | Tier | Kustannus/kk |
+|---------------|------|--------------|
+| 1-100 | Free | $0 |
+| 100-1000 | Pro | $25 |
+| 1000-10000 | Pro + addons | ~$50-100 |
+| 10000+ | → AWS migration | Vaihtelee |
+
+### 9.2 AWS (Vertailu)
+
+| Käyttäjämäärä | Komponentit | Kustannus/kk |
+|---------------|-------------|--------------|
+| 1-100 | Cognito Free + Lambda + DynamoDB | ~$5 |
+| 100-1000 | + RDS t3.micro | ~$20-30 |
+| 1000-10000 | + RDS t3.small + ElastiCache | ~$100-200 |
+
+**Suositus:** Aloita Supabasella, migroi AWS:lle jos käyttäjämäärä ylittää 10K tai tarvitaan custom-infraa.
+
+---
+
+## 10. Riskit ja mitigaatio
 
 | Riski | Todennäköisyys | Vaikutus | Mitigaatio |
 |-------|:--------------:|:--------:|------------|
-| Supabase hinnoittelu muuttuu | Keskiverto | Korkea | Abstraktoi storage layer |
-| Offline-konfliktit | Korkea | Keskiverto | Last-write-wins + merge UI |
-| Datan menetys migraatiossa | Matala | Kriittinen | Säilytä localStorage backup |
+| Supabase hinnoittelu muuttuu | Keskiverto | Korkea | Abstraktoi storage layer, mahdollista AWS-migraatio |
+| Offline-konfliktit | Korkea | Keskiverto | Last-write-wins + merge UI konflikteille |
+| Datan menetys migraatiossa | Matala | Kriittinen | Säilytä localStorage backup, varmista ennen poistoa |
+| Auth token expiry | Keskiverto | Matala | Auto-refresh, graceful logout |
+| CORS-ongelmat | Keskiverto | Matala | Supabase hoitaa automaattisesti |
 | Vercel cold starts | Matala | Matala | Ei backendia → ei ongelmaa |
 | Mobile performance | Keskiverto | Keskiverto | Lazy loading, virtualization |
 
 ---
 
-## 9. Success Metrics
+## 11. Tekninen velka (V1 → V2)
 
-### 9.1 V2 Launch KPIs
+### 11.1 Refaktorointitarpeet
+
+| Komponentti | Muutos | Syy |
+|-------------|--------|-----|
+| `storage.js` | Abstraktoi interface | Cloud/Local vaihdettavuus |
+| `app.js` | Auth state lisäys | Kirjautumistila globaaliin stateen |
+| `index.html` | Login-näkymä | Uusi reitti/näkymä |
+| Event bus | Auth-eventit | `auth:login`, `auth:logout`, `auth:error` |
+
+### 11.2 Säilytettävät osat (ei muutoksia)
+
+- CodeMirror wrapper (editor.js)
+- Preview (preview.js)
+- Export (export.js)
+- UI/Layout (ui.js, CSS) - vain Login UI lisäys
+- Utils (utils.js)
+
+---
+
+## 12. Success Metrics
+
+### 12.1 V2 Launch KPIs
 
 | Metric | Target | Mittaus |
 |--------|--------|---------|
@@ -523,7 +803,7 @@ VITE_PLAUSIBLE_DOMAIN=ace-editor.app
 | Cloud sync errors | <1% | Error logging |
 | Page load time | <2s | Vercel Analytics |
 
-### 9.2 Analytics Setup (V1.5)
+### 12.2 Analytics Setup (V1.5)
 
 ```html
 <!-- Plausible (privacy-friendly) -->
@@ -533,7 +813,7 @@ VITE_PLAUSIBLE_DOMAIN=ace-editor.app
 
 ---
 
-## 10. Appendix
+## 13. Liitteet
 
 ### A. Tech Stack Summary
 
@@ -577,19 +857,37 @@ ace-markdown-editor/
 └── vercel.json           # Optional config
 ```
 
-### C. Useful Links
+### C. Environment Variables (.env)
+
+```env
+# Supabase
+VITE_SUPABASE_URL=https://xxx.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...
+
+# Analytics (optional)
+VITE_PLAUSIBLE_DOMAIN=ace-editor.app
+
+# Optional: AWS alternative
+# AWS_REGION=eu-north-1
+# AWS_COGNITO_USER_POOL_ID=eu-north-1_xxx
+# AWS_COGNITO_CLIENT_ID=xxx
+```
+
+### D. Useful Links
 
 - [Supabase Docs](https://supabase.com/docs)
+- [Supabase Auth JS](https://supabase.com/docs/reference/javascript/auth-signup)
 - [Supabase + Vercel Integration](https://vercel.com/integrations/supabase)
 - [Row Level Security Guide](https://supabase.com/docs/guides/auth/row-level-security)
+- [AWS Amplify](https://docs.amplify.aws/) (vaihtoehto)
 - [PWA Manifest Generator](https://www.simicart.com/manifest-generator.html)
 - [Plausible Analytics](https://plausible.io)
 
 ---
 
-## 11. Session #4 Huomiot (Claude.ai Review)
+## 14. Session #4 Huomiot (Claude.ai Review)
 
-### Lisätyt parannukset tähän dokumenttiin:
+### Lisätyt parannukset v1.0:
 
 1. **V1.0 status päivitetty** - Vercel deploy ✅, live URL lisätty
 2. **V1.5 backlog** - UI polish taskit eritelty (search, shortcuts, macOS dots)
@@ -600,6 +898,17 @@ ace-markdown-editor/
 7. **Timeline tarkennettu** - Realistiset arviot viikoissa
 8. **File structure** - V2 kansiorakenne
 
+### Palautetut osiot v1.1:
+
+9. **AWS arkkitehtuurikaavio** - Täysi ASCII-kaavio
+10. **PostgreSQL vs DynamoDB** - Vertailutaulukko
+11. **CloudStorage koodiesimerkki** - Supabase client
+12. **HybridStorage koodi** - Migraatiologiikka
+13. **Auth State Flow kaavio** - Visualisointi
+14. **Offline-first kaavio** - V2.1 strategia
+15. **Tekninen velka osio** - Refaktorointitarpeet
+16. **.env esimerkki** - AWS vaihtoehdot mukana
+
 ### Seuraavat askeleet:
 
 1. **Tällä viikolla:** V1.5 UI polish (search, shortcuts)
@@ -609,5 +918,6 @@ ace-markdown-editor/
 ---
 
 *Dokumentti: V2 Cloud Migration Roadmap*  
+*Versio: 1.1 (Complete)*
 *Reviewed: Claude.ai Session #4*  
 *Status: Approved for V1.5 implementation*
